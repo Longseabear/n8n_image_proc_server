@@ -1,0 +1,6 @@
+{
+  "name": "Append B",
+  "script": "append_text.py",
+  "appendText": "B",
+  "timeoutMs": 10000
+}

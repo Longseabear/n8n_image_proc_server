@@ -15,14 +15,16 @@ $env:N8N_COMMUNITY_PACKAGES_ENABLED = "false"
 $env:N8N_VERIFIED_PACKAGES_ENABLED = "false"
 $env:N8N_UNVERIFIED_PACKAGES_ENABLED = "false"
 $env:N8N_CUSTOM_EXTENSIONS = (Join-Path $dataPath ".n8n\custom")
+$env:N8N_WORKSPACE_ROOT = $root
 $env:PIPELINE_GLOBAL_PARAMETER = "global-from-start-script"
-$env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD"]'
+$env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD","CUSTOM.presetScriptRunner"]'
 
 Write-Host "Starting n8n"
 Write-Host "Data path: $dataPath"
 Write-Host "Editor: http://localhost:5678"
 Write-Host "Community nodes: disabled"
 Write-Host "Custom nodes: $env:N8N_CUSTOM_EXTENSIONS"
+Write-Host "Workspace root: $env:N8N_WORKSPACE_ROOT"
 Write-Host "Pipeline global parameter: $env:PIPELINE_GLOBAL_PARAMETER"
 Write-Host "Allowed nodes: $env:NODES_INCLUDE"
 

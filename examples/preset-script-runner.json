@@ -1,0 +1,79 @@
+[
+  {
+    "id": "presetScriptRunner01",
+    "name": "Preset Script Runner Example",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual-trigger-preset",
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          180,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "preset": "append-a.json",
+          "initialValue": "input-",
+          "pythonCommand": "python"
+        },
+        "id": "preset-append-a",
+        "name": "Preset Append A",
+        "type": "CUSTOM.presetScriptRunner",
+        "typeVersion": 1,
+        "position": [
+          440,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "preset": "append-b.json",
+          "initialValue": "",
+          "pythonCommand": "python"
+        },
+        "id": "preset-append-b",
+        "name": "Preset Append B",
+        "type": "CUSTOM.presetScriptRunner",
+        "typeVersion": 1,
+        "position": [
+          700,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Preset Append A",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Preset Append A": {
+        "main": [
+          [
+            {
+              "node": "Preset Append B",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {},
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "active": false,
+    "tags": []
+  }
+]

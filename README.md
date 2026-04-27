@@ -51,6 +51,7 @@ The node panel is limited to:
 - `Pipeline B`
 - `Pipeline C`
 - `Pipeline D`
+- `Preset Script Runner`
 
 `Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
 
@@ -60,6 +61,20 @@ An importable example is available at:
 
 ```text
 examples/pipeline-abcd-global.json
+```
+
+`Preset Script Runner` demonstrates a preset-driven node. The node UI exposes a preset dropdown, while the actual behavior is stored in workspace files:
+
+```text
+presets/append-a.json
+presets/append-b.json
+user-scripts/append_text.py
+```
+
+An importable example is available at:
+
+```text
+examples/preset-script-runner.json
 ```
 
 ## Generate A Workflow From Setting
