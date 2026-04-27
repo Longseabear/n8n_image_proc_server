@@ -146,6 +146,16 @@ To generate and import it into the local n8n database in one step:
 npm run sync:workflow
 ```
 
+## Harness
+
+Run the local harness without starting n8n:
+
+```powershell
+npm run harness
+```
+
+The harness checks JSON files, custom node package registrations, `ISPInput` manual and webhook input behavior, `ISPBlock` ProcA/ProcB file-list propagation, `Preset Script Runner`, `Python Add`, and the ISP workflow shape.
+
 ## Supported Generated Node Kinds
 
 The generator currently supports:

@@ -7,7 +7,8 @@
     "install:custom-nodes": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-custom-nodes.ps1",
     "build:workflow": "node ./scripts/build-workflow-from-setting.js",
     "import:workflow": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/import-generated-workflow.ps1",
-    "sync:workflow": "npm run build:workflow && npm run import:workflow"
+    "sync:workflow": "npm run build:workflow && npm run import:workflow",
+    "harness": "node ./scripts/harness.js"
   },
   "keywords": [],
   "author": "",
