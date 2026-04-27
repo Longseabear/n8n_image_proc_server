@@ -1,0 +1,91 @@
+[
+  {
+    "id": "ispWorkflow01",
+    "name": "ISP ProcA ProcB Workflow",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual-trigger-isp",
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          180,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "blockName": "ProcA",
+          "inputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}",
+          "globalInput": {
+            "gain": 1.5,
+            "EIT": "eit-demo",
+            "TMC": "tmc-demo"
+          },
+          "outputDirectory": "",
+          "includeReadme": true
+        },
+        "id": "isp-proc-a",
+        "name": "ISP ProcA",
+        "type": "CUSTOM.ispBlock",
+        "typeVersion": 1,
+        "position": [
+          450,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "blockName": "ProcB",
+          "inputFilesJson": "{}",
+          "globalInput": {
+            "gain": 1.5,
+            "EIT": "eit-demo",
+            "TMC": "tmc-demo"
+          },
+          "outputDirectory": "",
+          "includeReadme": true
+        },
+        "id": "isp-proc-b",
+        "name": "ISP ProcB",
+        "type": "CUSTOM.ispBlock",
+        "typeVersion": 1,
+        "position": [
+          720,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "ISP ProcA",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ISP ProcA": {
+        "main": [
+          [
+            {
+              "node": "ISP ProcB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {},
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "active": false,
+    "tags": []
+  }
+]

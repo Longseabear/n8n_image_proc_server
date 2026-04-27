@@ -52,6 +52,7 @@ The node panel is limited to:
 - `Pipeline C`
 - `Pipeline D`
 - `Preset Script Runner`
+- `ISPBlock`
 
 `Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
 
@@ -75,6 +76,21 @@ An importable example is available at:
 
 ```text
 examples/preset-script-runner.json
+```
+
+`ISPBlock` demonstrates a folder-managed image-processing block. Blocks live under:
+
+```text
+ISPBlock/ProcA/README.md
+ISPBlock/ProcB/README.md
+```
+
+The node exposes a dropdown populated from `ISPBlock/*` folders. For now, `ProcA` and `ProcB` do not process image bytes; they return output paths as the original image name plus the selected block name.
+
+An importable example is available at:
+
+```text
+examples/isp-workflow.json
 ```
 
 ## Generate A Workflow From Setting
