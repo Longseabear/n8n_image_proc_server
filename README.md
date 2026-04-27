@@ -46,6 +46,7 @@ Recent n8n versions require login. On first launch, create the owner account in 
 The node panel is limited to:
 
 - `Manual Trigger`
+- `Webhook`
 - `Python Add`
 - `Pipeline A`
 - `Pipeline B`
@@ -98,6 +99,23 @@ An importable example is available at:
 
 ```text
 examples/isp-workflow.json
+```
+
+The ISP example can start manually or through a webhook:
+
+```text
+Manual Trigger -> ISPInput -> ISPBlock
+Webhook        -> ISPInput -> ISPBlock
+```
+
+Webhook body example:
+
+```json
+{
+  "files": {
+    "raw": "C:/images/input.png"
+  }
+}
 ```
 
 ## Generate A Workflow From Setting

@@ -16,6 +16,24 @@
       },
       {
         "parameters": {
+          "httpMethod": "POST",
+          "path": "isp",
+          "responseMode": "onReceived",
+          "responseData": "firstEntryJson"
+        },
+        "id": "webhook-isp",
+        "name": "Webhook ISP",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          180,
+          460
+        ],
+        "webhookId": "isp-webhook"
+      },
+      {
+        "parameters": {
+          "fileSource": "auto",
           "inputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}"
         },
         "id": "isp-input",
@@ -62,6 +80,17 @@
     ],
     "connections": {
       "Start": {
+        "main": [
+          [
+            {
+              "node": "ISP Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook ISP": {
         "main": [
           [
             {

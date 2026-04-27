@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-python-add",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Local n8n custom nodes for Python add, pipeline, preset script, and ISP demos.",
   "main": "index.js",
   "keywords": [
