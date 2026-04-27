@@ -1,0 +1,18 @@
+{
+  "name": "n8n-nodes-python-add",
+  "version": "0.1.0",
+  "description": "Local n8n custom node that adds A and B using Python.",
+  "main": "index.js",
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "license": "ISC",
+  "n8n": {
+    "nodes": [
+      "dist/nodes/PythonAdd/PythonAdd.node.js"
+    ]
+  },
+  "dependencies": {
+    "n8n-workflow": "2.15.0"
+  }
+}

@@ -6,6 +6,7 @@ This repo is set up to:
 
 - run n8n locally at `http://localhost:5678`
 - keep n8n runtime data inside `.n8n-data/`
+- load a local `Python Add` custom node
 - generate importable n8n workflow JSON from `workflow-source/setting.json`
 
 ## Requirements
@@ -24,6 +25,12 @@ npm install
 
 ## Run n8n
 
+Install local custom nodes first:
+
+```powershell
+npm run install:custom-nodes
+```
+
 ```powershell
 npm start
 ```
@@ -35,6 +42,13 @@ http://localhost:5678
 ```
 
 Recent n8n versions require login. On first launch, create the owner account in the browser.
+
+The node panel is limited to:
+
+- `Manual Trigger`
+- `Python Add`
+
+`Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
 
 ## Generate A Workflow From Setting
 

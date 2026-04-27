@@ -1,0 +1,10 @@
+{
+  "node": "n8n-nodes-python-add.pythonAdd",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Local Nodes"],
+  "alias": ["Python", "Add", "Sum", "A Plus B"],
+  "subcategories": {
+    "Local Nodes": ["Math"]
+  }
+}
