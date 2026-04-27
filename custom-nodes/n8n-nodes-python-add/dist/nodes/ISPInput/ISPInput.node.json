@@ -1,0 +1,10 @@
+{
+  "node": "n8n-nodes-python-add.ispInput",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Local Nodes"],
+  "alias": ["ISP", "Input", "File List", "Placeholder"],
+  "subcategories": {
+    "Local Nodes": ["ISP"]
+  }
+}

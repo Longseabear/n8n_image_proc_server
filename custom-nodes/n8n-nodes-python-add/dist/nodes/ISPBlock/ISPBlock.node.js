@@ -123,8 +123,8 @@ class ISPBlock {
 					displayName: "Input Files JSON",
 					name: "inputFilesJson",
 					type: "json",
-					default: "{\n  \"raw\": \"C:/images/input.png\"\n}",
-					description: "Used only when the incoming item has no files field. Shape: key=name, value=file path.",
+					default: "{}",
+					description: "Fallback only. Prefer connecting ISPInput before ISPBlock. Shape: key=name, value=file path.",
 				},
 				{
 					displayName: "Global Config File: edit workspace/ISPBlock/global.json once to update gain, EIT, and TMC for every ISPBlock node.",

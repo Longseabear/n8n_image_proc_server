@@ -16,8 +16,21 @@
       },
       {
         "parameters": {
+          "inputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}"
+        },
+        "id": "isp-input",
+        "name": "ISP Input",
+        "type": "CUSTOM.ispInput",
+        "typeVersion": 1,
+        "position": [
+          420,
+          300
+        ]
+      },
+      {
+        "parameters": {
           "blockName": "ProcA",
-          "inputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}",
+          "inputFilesJson": "{}",
           "outputDirectory": "",
           "includeReadme": true
         },
@@ -26,7 +39,7 @@
         "type": "CUSTOM.ispBlock",
         "typeVersion": 1,
         "position": [
-          450,
+          680,
           300
         ]
       },
@@ -42,13 +55,24 @@
         "type": "CUSTOM.ispBlock",
         "typeVersion": 1,
         "position": [
-          720,
+          940,
           300
         ]
       }
     ],
     "connections": {
       "Start": {
+        "main": [
+          [
+            {
+              "node": "ISP Input",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ISP Input": {
         "main": [
           [
             {

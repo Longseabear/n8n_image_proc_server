@@ -17,7 +17,7 @@ $env:N8N_UNVERIFIED_PACKAGES_ENABLED = "false"
 $env:N8N_CUSTOM_EXTENSIONS = (Join-Path $dataPath ".n8n\custom")
 $env:N8N_WORKSPACE_ROOT = $root
 $env:PIPELINE_GLOBAL_PARAMETER = "global-from-start-script"
-$env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD","CUSTOM.presetScriptRunner","CUSTOM.ispBlock"]'
+$env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","n8n-nodes-base.set","n8n-nodes-base.code","n8n-nodes-base.merge","n8n-nodes-base.if","n8n-nodes-base.switch","n8n-nodes-base.noOp","n8n-nodes-base.stickyNote","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD","CUSTOM.presetScriptRunner","CUSTOM.ispInput","CUSTOM.ispBlock"]'
 
 Write-Host "Starting n8n"
 Write-Host "Data path: $dataPath"

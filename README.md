@@ -52,6 +52,7 @@ The node panel is limited to:
 - `Pipeline C`
 - `Pipeline D`
 - `Preset Script Runner`
+- `ISPInput`
 - `ISPBlock`
 
 `Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
@@ -78,14 +79,14 @@ An importable example is available at:
 examples/preset-script-runner.json
 ```
 
-`ISPBlock` demonstrates a folder-managed image-processing block. Blocks live under:
+`ISPInput` creates the initial file list placeholder. `ISPBlock` demonstrates a folder-managed image-processing block. Blocks live under:
 
 ```text
 ISPBlock/ProcA/README.md
 ISPBlock/ProcB/README.md
 ```
 
-The node exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI. Shared ISP parameters live in one file:
+`ISPBlock` exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI. Shared ISP parameters live in one file:
 
 ```text
 ISPBlock/global.json
