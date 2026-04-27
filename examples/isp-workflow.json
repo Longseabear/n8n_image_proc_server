@@ -50,6 +50,10 @@
           "blockName": "ProcA",
           "inputFilesJson": "{}",
           "outputDirectory": "",
+          "runProcessor": true,
+          "pythonCommand": "python",
+          "requireInputFiles": false,
+          "processorTimeoutMs": 30000,
           "includeReadme": true
         },
         "id": "isp-proc-a",
@@ -66,6 +70,10 @@
           "blockName": "ProcB",
           "inputFilesJson": "{}",
           "outputDirectory": "",
+          "runProcessor": true,
+          "pythonCommand": "python",
+          "requireInputFiles": false,
+          "processorTimeoutMs": 30000,
           "includeReadme": true
         },
         "id": "isp-proc-b",

@@ -87,13 +87,19 @@ ISPBlock/ProcA/README.md
 ISPBlock/ProcB/README.md
 ```
 
-`ISPBlock` exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI. Shared ISP parameters live in one file:
+`ISPBlock` exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI. Each block can include a `process.py` file:
+
+```text
+ISPBlock/<BlockName>/process.py
+```
+
+`ISPBlock` passes a JSON payload through stdin and reads optional JSON from stdout. Shared ISP parameters live in one file:
 
 ```text
 ISPBlock/global.json
 ```
 
-Edit that file once to update `gain`, `EIT`, and `TMC` for every `ISPBlock` node. For now, `ProcA` and `ProcB` do not process image bytes; they return output paths as the original image name plus the selected block name.
+Edit that file once to update `gain`, `EIT`, and `TMC` for every `ISPBlock` node. Current `ProcA` and `ProcB` are no-op image processors: when an input file exists, they copy it to the generated output path.
 
 An importable example is available at:
 

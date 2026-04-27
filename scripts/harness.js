@@ -98,17 +98,21 @@ async function testCustomNodePackage() {
 async function testISPManualAndWebhookFlow() {
 	const { ISPInput } = require("../custom-nodes/n8n-nodes-python-add/dist/nodes/ISPInput/ISPInput.node.js");
 	const { ISPBlock } = require("../custom-nodes/n8n-nodes-python-add/dist/nodes/ISPBlock/ISPBlock.node.js");
+	const tmpDir = path.join(root, "exports", "harness");
+	const inputPath = path.join(tmpDir, "input.png");
+	fs.mkdirSync(tmpDir, { recursive: true });
+	fs.writeFileSync(inputPath, "not-a-real-image-but-valid-file-for-copy-tests", "utf8");
 
 	const manualInput = await executeNode(ISPInput, {
 		items: [{ json: {} }],
 		params: {
 			fileSource: "auto",
-			inputFilesJson: '{ "raw": "C:/images/input.png" }',
+			inputFilesJson: JSON.stringify({ raw: inputPath }),
 		},
 	});
 	const manualItem = manualInput[0][0];
-	assert(manualItem.json.files.raw === "C:/images/input.png", "manual ISPInput should create files.raw");
-	assert(manualItem.json.originalFiles.raw === "C:/images/input.png", "manual ISPInput should create originalFiles.raw");
+	assert(manualItem.json.files.raw === inputPath, "manual ISPInput should create files.raw");
+	assert(manualItem.json.originalFiles.raw === inputPath, "manual ISPInput should create originalFiles.raw");
 
 	const webhookInput = await executeNode(ISPInput, {
 		items: [{ json: { body: { files: { raw: "C:/images/webhook.png" } } } }],
@@ -124,30 +128,44 @@ async function testISPManualAndWebhookFlow() {
 		params: {
 			blockName: "ProcA",
 			inputFilesJson: "{}",
-			outputDirectory: "",
+			outputDirectory: tmpDir,
+			runProcessor: true,
+			pythonCommand: "python",
+			requireInputFiles: true,
+			processorTimeoutMs: 30000,
 			includeReadme: true,
 		},
 	});
 	const procAItem = procA[0][0];
-	assert(procAItem.json.files.raw.replace(/\\/g, "/") === "C:/images/input_ProcA.png", "ProcA output path mismatch");
+	const expectedProcAPath = path.join(tmpDir, "input_ProcA.png");
+	assert(procAItem.json.files.raw === expectedProcAPath, "ProcA output path mismatch");
+	assert(fs.existsSync(expectedProcAPath), "ProcA should create output file");
 	assert(procAItem.json.globalInput.gain === 1.5, "ISPBlock should read shared global gain");
 	assert(procAItem.json.blockReadme.includes("ProcA"), "ProcA README should be included in output");
+	assert(procAItem.json.processingResult.ran === true, "ProcA process.py should run");
 
 	const procB = await executeNode(ISPBlock, {
 		items: [procAItem],
 		params: {
 			blockName: "ProcB",
 			inputFilesJson: "{}",
-			outputDirectory: "",
+			outputDirectory: tmpDir,
+			runProcessor: true,
+			pythonCommand: "python",
+			requireInputFiles: true,
+			processorTimeoutMs: 30000,
 			includeReadme: true,
 		},
 	});
 	const procBItem = procB[0][0];
-	assert(procBItem.json.files.raw.replace(/\\/g, "/") === "C:/images/input_ProcB.png", "ProcB output path mismatch");
+	const expectedProcBPath = path.join(tmpDir, "input_ProcB.png");
+	assert(procBItem.json.files.raw === expectedProcBPath, "ProcB output path mismatch");
+	assert(fs.existsSync(expectedProcBPath), "ProcB should create output file");
 	assert(
-		procBItem.json.ispHistory[1].inputFiles.raw.replace(/\\/g, "/") === "C:/images/input_ProcA.png",
+		procBItem.json.ispHistory[1].inputFiles.raw === expectedProcAPath,
 		"ProcB history should record ProcA output as input",
 	);
+	assert(procBItem.json.processingResult.ran === true, "ProcB process.py should run");
 
 	pass("ISPInput and ISPBlock manual/webhook flow");
 }

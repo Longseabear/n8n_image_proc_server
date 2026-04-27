@@ -5,6 +5,7 @@ exports.ISPBlock = void 0;
 
 const fs = require("fs");
 const path = require("path");
+const { spawnSync } = require("child_process");
 const { NodeOperationError } = require("n8n-workflow");
 
 function getWorkspaceRoot() {
@@ -88,6 +89,64 @@ function makeOutputPath(inputPath, blockName, outputDirectory) {
 	return outputDirectory ? path.join(outputDirectory, outputName) : path.join(parsed.dir, outputName);
 }
 
+function runProcessorScript({ blockPath, blockName, files, outputFiles, originalFiles, globalInput, options, pythonCommand }) {
+	const scriptPath = path.join(blockPath, "process.py");
+	if (!fs.existsSync(scriptPath)) {
+		return {
+			ran: false,
+			reason: "process.py not found",
+		};
+	}
+
+	const payload = {
+		blockName,
+		inputFiles: files,
+		outputFiles,
+		originalFiles,
+		globalInput,
+		options,
+	};
+
+	for (const outputPath of Object.values(outputFiles)) {
+		const outputDirectory = path.dirname(String(outputPath));
+		if (outputDirectory) {
+			fs.mkdirSync(outputDirectory, { recursive: true });
+		}
+	}
+
+	const result = spawnSync(pythonCommand, [scriptPath], {
+		input: JSON.stringify(payload),
+		encoding: "utf8",
+		timeout: options.timeoutMs || 30000,
+		env: {
+			...process.env,
+			PYTHONUTF8: "1",
+			PYTHONIOENCODING: "utf-8",
+		},
+	});
+
+	if (result.error) {
+		throw result.error;
+	}
+
+	if (result.status !== 0) {
+		throw new Error((result.stderr || "").trim() || `process.py exited with ${result.status}`);
+	}
+
+	const stdout = (result.stdout || "").trim();
+	if (!stdout) {
+		return {
+			ran: true,
+			stdout: null,
+		};
+	}
+
+	return {
+		ran: true,
+		stdout: JSON.parse(stdout),
+	};
+}
+
 class ISPBlock {
 	constructor() {
 		this.description = {
@@ -140,6 +199,47 @@ class ISPBlock {
 					description: "Leave empty to place output paths next to the input files",
 				},
 				{
+					displayName: "Run process.py",
+					name: "runProcessor",
+					type: "boolean",
+					default: true,
+					description: "Whether to run ISPBlock/<Block>/process.py with the file-list payload",
+				},
+				{
+					displayName: "Python Command",
+					name: "pythonCommand",
+					type: "string",
+					default: "python",
+					displayOptions: {
+						show: {
+							runProcessor: [true],
+						},
+					},
+				},
+				{
+					displayName: "Require Input Files Exist",
+					name: "requireInputFiles",
+					type: "boolean",
+					default: false,
+					description: "Whether process.py should fail when an input path does not exist",
+					displayOptions: {
+						show: {
+							runProcessor: [true],
+						},
+					},
+				},
+				{
+					displayName: "Processor Timeout MS",
+					name: "processorTimeoutMs",
+					type: "number",
+					default: 30000,
+					displayOptions: {
+						show: {
+							runProcessor: [true],
+						},
+					},
+				},
+				{
 					displayName: "Include README in Output",
 					name: "includeReadme",
 					type: "boolean",
@@ -166,6 +266,10 @@ class ISPBlock {
 			const blockName = this.getNodeParameter("blockName", itemIndex);
 			const inputFilesJson = this.getNodeParameter("inputFilesJson", itemIndex);
 			const outputDirectory = this.getNodeParameter("outputDirectory", itemIndex);
+			const runProcessor = this.getNodeParameter("runProcessor", itemIndex);
+			const pythonCommand = this.getNodeParameter("pythonCommand", itemIndex);
+			const requireInputFiles = this.getNodeParameter("requireInputFiles", itemIndex);
+			const processorTimeoutMs = this.getNodeParameter("processorTimeoutMs", itemIndex);
 			const includeReadme = this.getNodeParameter("includeReadme", itemIndex);
 			let globalInput;
 
@@ -198,6 +302,32 @@ class ISPBlock {
 
 			const readmePath = path.join(blockPath, "README.md");
 			const blockReadme = fs.existsSync(readmePath) ? fs.readFileSync(readmePath, "utf8") : "";
+			let processingResult = {
+				ran: false,
+				reason: "disabled",
+			};
+
+			if (runProcessor) {
+				try {
+					processingResult = runProcessorScript({
+						blockPath,
+						blockName,
+						files,
+						outputFiles,
+						originalFiles,
+						globalInput,
+						pythonCommand,
+						options: {
+							requireInputFiles,
+							timeoutMs: processorTimeoutMs,
+						},
+					});
+				} catch (error) {
+					throw new NodeOperationError(this.getNode(), `ISP processor ${blockName} failed: ${error.message}`, {
+						itemIndex,
+					});
+				}
+			}
 
 			console.log(`[ISPBlock:${blockName}] files=${JSON.stringify(files)} global=${JSON.stringify(globalInput)}`);
 
@@ -216,8 +346,10 @@ class ISPBlock {
 							outputFiles,
 							globalInput,
 							readmePath,
+							processingResult,
 						},
 					],
+					processingResult,
 					...(includeReadme ? { blockReadme } : {}),
 				},
 				pairedItem: {

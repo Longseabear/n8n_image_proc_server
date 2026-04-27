@@ -6,5 +6,6 @@ Usage:
 
 - Select `ProcA` from the `ISPBlock` node dropdown.
 - Provide input files as JSON such as `{ "raw": "C:/images/input.png" }`.
-- This demo does not modify image bytes.
+- `process.py` is the image-processing entry point.
+- Current demo behavior copies the input file to the output path when the input file exists.
 - Output paths are generated as original image name plus `_ProcA`.
