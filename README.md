@@ -1,0 +1,117 @@
+# n8n Image Proc Server
+
+Local n8n starter workspace with a small workflow generator.
+
+This repo is set up to:
+
+- run n8n locally at `http://localhost:5678`
+- keep n8n runtime data inside `.n8n-data/`
+- generate importable n8n workflow JSON from `workflow-source/setting.json`
+
+## Requirements
+
+- Node.js `20.19` through `24.x`
+- npm
+- PowerShell on Windows
+
+This workspace was tested with Node.js `22.22.0` and n8n `2.15.0`.
+
+## Install
+
+```powershell
+npm install
+```
+
+## Run n8n
+
+```powershell
+npm start
+```
+
+Then open:
+
+```text
+http://localhost:5678
+```
+
+Recent n8n versions require login. On first launch, create the owner account in the browser.
+
+## Generate A Workflow From Setting
+
+Edit:
+
+```text
+workflow-source/setting.json
+```
+
+Then run:
+
+```powershell
+npm run build:workflow
+```
+
+The generated workflow is written to:
+
+```text
+exports/generated-workflow.json
+```
+
+Import that file from the n8n editor.
+
+## Supported Generated Node Kinds
+
+The generator currently supports:
+
+- `manualTrigger`
+- `set`
+- `code`
+- `merge`
+
+Example `workflow-source/setting.json`:
+
+```json
+{
+  "name": "Generated From Setting",
+  "output": "exports/generated-workflow.json",
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "kind": "manualTrigger"
+    },
+    {
+      "id": "message",
+      "name": "Show Message",
+      "kind": "set",
+      "values": {
+        "message": "hello"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "Start",
+      "to": "Show Message"
+    }
+  ]
+}
+```
+
+For more details, see `WORKFLOW_GENERATOR.md`.
+
+## Included Examples
+
+- `examples/two-node-starter.json`
+- `examples/four-node-branch-merge.json`
+
+These are importable n8n workflow examples.
+
+## Local Data
+
+The following are intentionally ignored by git:
+
+- `node_modules/`
+- `.n8n-data/`
+- `logs/`
+- local n8n log and pid files
+- `.env` files
