@@ -85,7 +85,13 @@ ISPBlock/ProcA/README.md
 ISPBlock/ProcB/README.md
 ```
 
-The node exposes a dropdown populated from `ISPBlock/*` folders. For now, `ProcA` and `ProcB` do not process image bytes; they return output paths as the original image name plus the selected block name.
+The node exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI. Shared ISP parameters live in one file:
+
+```text
+ISPBlock/global.json
+```
+
+Edit that file once to update `gain`, `EIT`, and `TMC` for every `ISPBlock` node. For now, `ProcA` and `ProcB` do not process image bytes; they return output paths as the original image name plus the selected block name.
 
 An importable example is available at:
 

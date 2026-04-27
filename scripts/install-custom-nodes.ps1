@@ -15,7 +15,7 @@ if (-not (Test-Path (Join-Path $customPath "package.json"))) {
 }
 
 Push-Location $customPath
-npm install $packagePath
+npm install --force $packagePath
 Pop-Location
 
 Write-Host "Installed custom nodes into $customPath"

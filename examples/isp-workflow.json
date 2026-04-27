@@ -18,11 +18,6 @@
         "parameters": {
           "blockName": "ProcA",
           "inputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}",
-          "globalInput": {
-            "gain": 1.5,
-            "EIT": "eit-demo",
-            "TMC": "tmc-demo"
-          },
           "outputDirectory": "",
           "includeReadme": true
         },
@@ -39,11 +34,6 @@
         "parameters": {
           "blockName": "ProcB",
           "inputFilesJson": "{}",
-          "globalInput": {
-            "gain": 1.5,
-            "EIT": "eit-demo",
-            "TMC": "tmc-demo"
-          },
           "outputDirectory": "",
           "includeReadme": true
         },

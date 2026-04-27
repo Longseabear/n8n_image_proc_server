@@ -38,6 +38,30 @@ function listBlocks() {
 		});
 }
 
+function readGlobalInput() {
+	const globalPath = path.join(getIspRoot(), "global.json");
+	if (!fs.existsSync(globalPath)) {
+		return {};
+	}
+
+	return JSON.parse(fs.readFileSync(globalPath, "utf8"));
+}
+
+function buildReadmeNotice() {
+	const blocks = listBlocks();
+	if (blocks.length === 0) {
+		return "No ISP blocks found. Add folders under workspace/ISPBlock.";
+	}
+
+	return blocks
+		.map((block) => {
+			const readmePath = path.join(getIspRoot(), block.value, "README.md");
+			const readme = fs.existsSync(readmePath) ? fs.readFileSync(readmePath, "utf8").trim() : "README.md not found.";
+			return `<b>${block.value}</b><br><pre>${readme}</pre>`;
+		})
+		.join("<br><br>");
+}
+
 function safeParseJson(value, fallback, label) {
 	if (typeof value !== "string" || value.trim() === "") {
 		return fallback;
@@ -80,7 +104,7 @@ class ISPBlock {
 			outputs: ["main"],
 			properties: [
 				{
-					displayName: "ISP blocks are loaded from workspace/ISPBlock/* folders. Each block folder should contain README.md. This demo does not process image bytes; it returns deterministic output paths.",
+					displayName: `ISP blocks are loaded from workspace/ISPBlock/* folders. Global input is shared from workspace/ISPBlock/global.json.<br><br>${buildReadmeNotice()}`,
 					name: "notice",
 					type: "notice",
 					default: "",
@@ -103,30 +127,10 @@ class ISPBlock {
 					description: "Used only when the incoming item has no files field. Shape: key=name, value=file path.",
 				},
 				{
-					displayName: "Global Input",
-					name: "globalInput",
-					type: "collection",
-					default: {},
-					options: [
-						{
-							displayName: "Gain",
-							name: "gain",
-							type: "number",
-							default: 1,
-						},
-						{
-							displayName: "EIT",
-							name: "EIT",
-							type: "string",
-							default: "",
-						},
-						{
-							displayName: "TMC",
-							name: "TMC",
-							type: "string",
-							default: "",
-						},
-					],
+					displayName: "Global Config File: edit workspace/ISPBlock/global.json once to update gain, EIT, and TMC for every ISPBlock node.",
+					name: "globalConfigNotice",
+					type: "notice",
+					default: "",
 				},
 				{
 					displayName: "Output Directory",
@@ -161,9 +165,17 @@ class ISPBlock {
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
 			const blockName = this.getNodeParameter("blockName", itemIndex);
 			const inputFilesJson = this.getNodeParameter("inputFilesJson", itemIndex);
-			const globalInput = this.getNodeParameter("globalInput", itemIndex);
 			const outputDirectory = this.getNodeParameter("outputDirectory", itemIndex);
 			const includeReadme = this.getNodeParameter("includeReadme", itemIndex);
+			let globalInput;
+
+			try {
+				globalInput = readGlobalInput();
+			} catch (error) {
+				throw new NodeOperationError(this.getNode(), `ISPBlock/global.json must be valid JSON: ${error.message}`, {
+					itemIndex,
+				});
+			}
 
 			const blockPath = path.join(ispRoot, blockName);
 			if (!fs.existsSync(blockPath) || !fs.statSync(blockPath).isDirectory()) {
