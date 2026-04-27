@@ -58,6 +58,12 @@ exports/generated-workflow.json
 
 Import that file from the n8n editor.
 
+To generate and import it into the local n8n database in one step:
+
+```powershell
+npm run sync:workflow
+```
+
 ## Supported Generated Node Kinds
 
 The generator currently supports:

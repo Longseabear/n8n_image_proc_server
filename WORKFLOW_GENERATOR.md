@@ -16,6 +16,12 @@ exports/generated-workflow.json
 
 Import that JSON file from the n8n editor.
 
+Or generate and import it into the local n8n database in one step:
+
+```powershell
+npm run sync:workflow
+```
+
 ## setting.json shape
 
 - `name`: workflow name

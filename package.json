@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Minimal local n8n starter",
   "scripts": {
-    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\start-n8n.ps1",
-    "build:workflow": "node ./scripts/build-workflow-from-setting.js"
+    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/start-n8n.ps1",
+    "build:workflow": "node ./scripts/build-workflow-from-setting.js",
+    "import:workflow": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/import-generated-workflow.ps1",
+    "sync:workflow": "npm run build:workflow && npm run import:workflow"
   },
   "keywords": [],
   "author": "",
