@@ -1,0 +1,92 @@
+{
+  "updatedAt": "2026-04-21T11:15:52.114Z",
+  "createdAt": "2026-04-21T11:07:45.480Z",
+  "id": "twoNodeStarter01",
+  "name": "Two Node Starter",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-1",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "message",
+              "value": "Second node connected successfully"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-node-1",
+      "name": "Show Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        576,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Show Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "714cc572-6721-4537-bf92-984dce7fa90e",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-04-21T11:07:45.486Z",
+      "createdAt": "2026-04-21T11:07:45.486Z",
+      "role": "workflow:owner",
+      "workflowId": "twoNodeStarter01",
+      "projectId": "8t5BnuVod4pv7ROa",
+      "project": {
+        "updatedAt": "2026-04-21T11:13:31.065Z",
+        "createdAt": "2026-04-21T11:03:19.711Z",
+        "id": "8t5BnuVod4pv7ROa",
+        "name": "HAEWOONG JANG <leap1568@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "e1257e75-19b8-4ea5-9f68-836f4cc7e6ae"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}

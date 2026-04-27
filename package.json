@@ -1,0 +1,15 @@
+{
+  "name": "n8n-local-starter",
+  "version": "1.0.0",
+  "description": "Minimal local n8n starter",
+  "scripts": {
+    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\start-n8n.ps1",
+    "build:workflow": "node ./scripts/build-workflow-from-setting.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "n8n": "2.15.0"
+  }
+}

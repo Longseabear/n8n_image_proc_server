@@ -1,0 +1,136 @@
+[
+  {
+    "id": "fourNodeBranch01",
+    "name": "Four Node Branch Merge",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual-trigger-start",
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          180,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return [\n  { json: { value: '1', source: 'Node A', index: 1 } },\n  { json: { value: '2', source: 'Node A', index: 2 } },\n];"
+        },
+        "id": "node-a",
+        "name": "Node A",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          420,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const items = $input.all();\nreturn [\n  {\n    json: {\n      node: 'Node B',\n      received: items[0].json.value,\n      note: 'Received the first output from Node A'\n    }\n  }\n];"
+        },
+        "id": "node-b",
+        "name": "Node B",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          700,
+          220
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const items = $input.all();\nreturn [\n  {\n    json: {\n      node: 'Node C',\n      received: items[1].json.value,\n      note: 'Received the second output from Node A'\n    }\n  }\n];"
+        },
+        "id": "node-c",
+        "name": "Node C",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          700,
+          380
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "append"
+        },
+        "id": "node-d",
+        "name": "Node D",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          980,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Node A",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Node A": {
+        "main": [
+          [
+            {
+              "node": "Node B",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Node C",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Node B": {
+        "main": [
+          [
+            {
+              "node": "Node D",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Node C": {
+        "main": [
+          [
+            {
+              "node": "Node D",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {},
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "active": false,
+    "tags": []
+  }
+]

@@ -1,0 +1,11 @@
+node_modules/
+.n8n-data/
+logs/
+
+n8n.err.log
+n8n.out.log
+n8n.pid
+
+.env
+.env.*
+!.env.example

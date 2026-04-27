@@ -1,0 +1,63 @@
+[
+  {
+    "id": "generated-from-setting",
+    "name": "Generated From Setting",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "start",
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          260,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "keepOnlySet": true,
+          "values": {
+            "string": [
+              {
+                "name": "message",
+                "value": "workflow-source/setting.json generated this node"
+              },
+              {
+                "name": "status",
+                "value": "ok"
+              }
+            ]
+          }
+        },
+        "id": "message",
+        "name": "Show Message",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 2,
+        "position": [
+          520,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Show Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {},
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "active": false,
+    "tags": []
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "name": "Generated From Setting",
+  "output": "exports/generated-workflow.json",
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "kind": "manualTrigger"
+    },
+    {
+      "id": "message",
+      "name": "Show Message",
+      "kind": "set",
+      "values": {
+        "message": "workflow-source/setting.json generated this node",
+        "status": "ok"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "Start",
+      "to": "Show Message"
+    }
+  ]
+}
