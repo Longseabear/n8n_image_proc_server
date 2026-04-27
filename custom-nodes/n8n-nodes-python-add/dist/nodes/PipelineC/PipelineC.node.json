@@ -1,0 +1,10 @@
+{
+  "node": "n8n-nodes-python-add.pipelineC",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Local Nodes"],
+  "alias": ["Pipeline", "C", "Append"],
+  "subcategories": {
+    "Local Nodes": ["Pipeline"]
+  }
+}

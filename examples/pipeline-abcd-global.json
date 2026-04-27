@@ -1,0 +1,128 @@
+[
+  {
+    "id": "pipelineAbcdGlobal01",
+    "name": "Pipeline A B C D Global",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual-trigger-pipeline",
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          180,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "initialInput": "input-",
+          "appendText": "A",
+          "globalParameterOverride": ""
+        },
+        "id": "pipeline-a",
+        "name": "Pipeline A",
+        "type": "CUSTOM.pipelineA",
+        "typeVersion": 1,
+        "position": [
+          420,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "appendText": "B",
+          "globalParameterOverride": ""
+        },
+        "id": "pipeline-b",
+        "name": "Pipeline B",
+        "type": "CUSTOM.pipelineB",
+        "typeVersion": 1,
+        "position": [
+          660,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "appendText": "C",
+          "globalParameterOverride": ""
+        },
+        "id": "pipeline-c",
+        "name": "Pipeline C",
+        "type": "CUSTOM.pipelineC",
+        "typeVersion": 1,
+        "position": [
+          900,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "appendText": "D",
+          "globalParameterOverride": ""
+        },
+        "id": "pipeline-d",
+        "name": "Pipeline D",
+        "type": "CUSTOM.pipelineD",
+        "typeVersion": 1,
+        "position": [
+          1140,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Pipeline A",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pipeline A": {
+        "main": [
+          [
+            {
+              "node": "Pipeline B",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pipeline B": {
+        "main": [
+          [
+            {
+              "node": "Pipeline C",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Pipeline C": {
+        "main": [
+          [
+            {
+              "node": "Pipeline D",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {},
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "active": false,
+    "tags": []
+  }
+]

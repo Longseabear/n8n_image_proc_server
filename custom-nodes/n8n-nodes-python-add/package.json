@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-python-add",
-  "version": "0.1.0",
-  "description": "Local n8n custom node that adds A and B using Python.",
+  "version": "0.2.0",
+  "description": "Local n8n custom nodes for Python add and pipeline demos.",
   "main": "index.js",
   "keywords": [
     "n8n-community-node-package"
@@ -9,7 +9,11 @@
   "license": "ISC",
   "n8n": {
     "nodes": [
-      "dist/nodes/PythonAdd/PythonAdd.node.js"
+      "dist/nodes/PythonAdd/PythonAdd.node.js",
+      "dist/nodes/PipelineA/PipelineA.node.js",
+      "dist/nodes/PipelineB/PipelineB.node.js",
+      "dist/nodes/PipelineC/PipelineC.node.js",
+      "dist/nodes/PipelineD/PipelineD.node.js"
     ]
   },
   "dependencies": {

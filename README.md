@@ -47,8 +47,20 @@ The node panel is limited to:
 
 - `Manual Trigger`
 - `Python Add`
+- `Pipeline A`
+- `Pipeline B`
+- `Pipeline C`
+- `Pipeline D`
 
 `Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
+
+The pipeline nodes form a simple `A -> B -> C -> D` demo. Each node reads `value`, prints the input in the n8n server log, appends its own letter, and outputs the next `value`. All pipeline nodes read the shared `PIPELINE_GLOBAL_PARAMETER` value from `scripts/start-n8n.ps1`.
+
+An importable example is available at:
+
+```text
+examples/pipeline-abcd-global.json
+```
 
 ## Generate A Workflow From Setting
 
