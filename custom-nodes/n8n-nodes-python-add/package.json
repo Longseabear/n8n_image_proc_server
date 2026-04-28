@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-python-add",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Local n8n custom nodes for Python add, pipeline, preset script, and ISP demos.",
   "main": "index.js",
   "keywords": [
@@ -16,7 +16,8 @@
       "dist/nodes/PipelineD/PipelineD.node.js",
       "dist/nodes/PresetScriptRunner/PresetScriptRunner.node.js",
       "dist/nodes/ISPInput/ISPInput.node.js",
-      "dist/nodes/ISPBlock/ISPBlock.node.js"
+      "dist/nodes/ISPBlock/ISPBlock.node.js",
+      "dist/nodes/ISPScript/ISPScript.node.js"
     ]
   },
   "dependencies": {

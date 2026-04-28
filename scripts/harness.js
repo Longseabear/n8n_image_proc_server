@@ -66,6 +66,7 @@ async function testJsonFiles() {
 		"examples/pipeline-abcd-global.json",
 		"examples/preset-script-runner.json",
 		"examples/isp-workflow.json",
+		"examples/isp-script-workflow.json",
 		"ISPBlock/global.json",
 		"presets/append-a.json",
 		"presets/append-b.json",
@@ -229,6 +230,38 @@ async function testPythonAdd() {
 	pass("Python Add executes Python");
 }
 
+async function testISPScript() {
+	const { ISPScript } = require("../custom-nodes/n8n-nodes-python-add/dist/nodes/ISPScript/ISPScript.node.js");
+	const node = new ISPScript();
+	const algorithms = await node.methods.loadOptions.getAlgorithms();
+	assert(algorithms.some((algorithm) => algorithm.value === "ScriptA"), "ISPScript should list ScriptA");
+	assert(algorithms.some((algorithm) => algorithm.value === "ScriptB"), "ISPScript should list ScriptB");
+	assert(algorithms.some((algorithm) => algorithm.value === "ScriptC"), "ISPScript should list ScriptC");
+
+	const scriptA = await executeNode(ISPScript, {
+		items: [{ json: { value: "seed" } }],
+		params: {
+			algorithmName: "ScriptA",
+			pythonCommand: "python",
+			timeoutMs: 30000,
+		},
+	});
+	assert(scriptA[0][0].json.lastISPScript === "ScriptA", "ISPScript should execute ScriptA");
+
+	const scriptB = await executeNode(ISPScript, {
+		items: [scriptA[0][0]],
+		params: {
+			algorithmName: "ScriptB",
+			pythonCommand: "python",
+			timeoutMs: 30000,
+		},
+	});
+	assert(scriptB[0][0].json.lastISPScript === "ScriptB", "ISPScript should execute ScriptB");
+	assert(scriptB[0][0].json.ispScripts.join(",") === "ScriptA,ScriptB", "ISPScript should preserve script history");
+
+	pass("ISPScript discovers and executes algorithms");
+}
+
 async function testWorkflowShape() {
 	const workflow = readJson("examples/isp-workflow.json")[0];
 	const nodesByName = Object.fromEntries(workflow.nodes.map((node) => [node.name, node]));
@@ -250,6 +283,7 @@ async function testWorkflowShape() {
 		"n8n-nodes-base.merge",
 		"CUSTOM.ispInput",
 		"CUSTOM.ispBlock",
+		"CUSTOM.ispScript",
 		"N8N_CONCURRENCY_PRODUCTION_LIMIT",
 	]) {
 		assert(startScript.includes(required), `start script should allow ${required}`);
@@ -265,6 +299,7 @@ async function main() {
 		testISPManualAndWebhookFlow,
 		testPresetScriptRunner,
 		testPythonAdd,
+		testISPScript,
 		testWorkflowShape,
 	];
 

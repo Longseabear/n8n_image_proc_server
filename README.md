@@ -55,6 +55,7 @@ The node panel is limited to:
 - `Preset Script Runner`
 - `ISPInput`
 - `ISPBlock`
+- `ISPScript`
 
 `Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
 
@@ -155,6 +156,22 @@ Webhook body example:
   }
 }
 ```
+
+`ISPScript` is a helper node that discovers Python algorithms from:
+
+```text
+ISPScript/<AlgorithmName>/run.py
+```
+
+Example algorithms are included:
+
+```text
+ISPScript/ScriptA/run.py
+ISPScript/ScriptB/run.py
+ISPScript/ScriptC/run.py
+```
+
+The node dropdown lists algorithm folders automatically. The selected `run.py` receives the current item JSON through stdin and must print JSON to stdout.
 
 ## Generate A Workflow From Setting
 

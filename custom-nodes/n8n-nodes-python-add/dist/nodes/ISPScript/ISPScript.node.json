@@ -1,0 +1,10 @@
+{
+  "node": "n8n-nodes-python-add.ispScript",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Local Nodes"],
+  "alias": ["ISP", "Script", "Algorithm", "Python"],
+  "subcategories": {
+    "Local Nodes": ["ISP"]
+  }
+}

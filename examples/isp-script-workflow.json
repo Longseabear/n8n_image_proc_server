@@ -1,0 +1,79 @@
+[
+  {
+    "id": "ispScriptWorkflow01",
+    "name": "ISPScript Example Workflow",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "manual-trigger-isp-script",
+        "name": "Start",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          180,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "algorithmName": "ScriptA",
+          "pythonCommand": "python",
+          "timeoutMs": 30000
+        },
+        "id": "isp-script-a",
+        "name": "ISPScript A",
+        "type": "CUSTOM.ispScript",
+        "typeVersion": 1,
+        "position": [
+          440,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "algorithmName": "ScriptB",
+          "pythonCommand": "python",
+          "timeoutMs": 30000
+        },
+        "id": "isp-script-b",
+        "name": "ISPScript B",
+        "type": "CUSTOM.ispScript",
+        "typeVersion": 1,
+        "position": [
+          700,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "ISPScript A",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "ISPScript A": {
+        "main": [
+          [
+            {
+              "node": "ISPScript B",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {},
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "active": false,
+    "tags": []
+  }
+]
