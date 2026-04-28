@@ -16,6 +16,7 @@ $env:N8N_VERIFIED_PACKAGES_ENABLED = "false"
 $env:N8N_UNVERIFIED_PACKAGES_ENABLED = "false"
 $env:N8N_CUSTOM_EXTENSIONS = (Join-Path $dataPath ".n8n\custom")
 $env:N8N_WORKSPACE_ROOT = $root
+$env:N8N_CONCURRENCY_PRODUCTION_LIMIT = "1"
 $env:PIPELINE_GLOBAL_PARAMETER = "global-from-start-script"
 $env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","n8n-nodes-base.webhook","n8n-nodes-base.set","n8n-nodes-base.code","n8n-nodes-base.merge","n8n-nodes-base.if","n8n-nodes-base.switch","n8n-nodes-base.noOp","n8n-nodes-base.stickyNote","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD","CUSTOM.presetScriptRunner","CUSTOM.ispInput","CUSTOM.ispBlock"]'
 
@@ -25,6 +26,7 @@ Write-Host "Editor: http://localhost:5678"
 Write-Host "Community nodes: disabled"
 Write-Host "Custom nodes: $env:N8N_CUSTOM_EXTENSIONS"
 Write-Host "Workspace root: $env:N8N_WORKSPACE_ROOT"
+Write-Host "Production concurrency limit: $env:N8N_CONCURRENCY_PRODUCTION_LIMIT"
 Write-Host "Pipeline global parameter: $env:PIPELINE_GLOBAL_PARAMETER"
 Write-Host "Allowed nodes: $env:NODES_INCLUDE"
 

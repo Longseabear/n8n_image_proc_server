@@ -93,13 +93,42 @@ ISPBlock/ProcB/README.md
 ISPBlock/<BlockName>/process.py
 ```
 
-`ISPBlock` passes a JSON payload through stdin and reads optional JSON from stdout. Shared ISP parameters live in one file:
+`ISPBlock` passes a JSON payload through stdin and reads optional JSON from stdout. Each `process.py` is a Python wrapper that can call a real executable. The example blocks use:
+
+```text
+ISPBlock/ProcA/block.json
+ISPBlock/ProcB/block.json
+ISPBlock/_tools/mock_isp_exe.py
+```
+
+Replace the `executable` and `args` in each `block.json` with the real `.exe` command later.
+
+The ISP payload has separate main and sub inputs:
+
+```json
+{
+  "mainFiles": {
+    "raw": "C:/images/input.png"
+  },
+  "subFiles": {
+    "calibration": "C:/images/calibration.png"
+  }
+}
+```
+
+Shared ISP parameters live in one file:
 
 ```text
 ISPBlock/global.json
 ```
 
 Edit that file once to update `gain`, `EIT`, and `TMC` for every `ISPBlock` node. Current `ProcA` and `ProcB` are no-op image processors: when an input file exists, they copy it to the generated output path.
+
+Production webhook/trigger execution concurrency is limited to one at a time in `scripts/start-n8n.ps1`:
+
+```powershell
+$env:N8N_CONCURRENCY_PRODUCTION_LIMIT = "1"
+```
 
 An importable example is available at:
 
@@ -118,8 +147,11 @@ Webhook body example:
 
 ```json
 {
-  "files": {
+  "mainFiles": {
     "raw": "C:/images/input.png"
+  },
+  "subFiles": {
+    "calibration": "C:/images/calibration.png"
   }
 }
 ```

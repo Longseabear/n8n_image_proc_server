@@ -100,28 +100,41 @@ async function testISPManualAndWebhookFlow() {
 	const { ISPBlock } = require("../custom-nodes/n8n-nodes-python-add/dist/nodes/ISPBlock/ISPBlock.node.js");
 	const tmpDir = path.join(root, "exports", "harness");
 	const inputPath = path.join(tmpDir, "input.png");
+	const subInputPath = path.join(tmpDir, "calibration.png");
 	fs.mkdirSync(tmpDir, { recursive: true });
 	fs.writeFileSync(inputPath, "not-a-real-image-but-valid-file-for-copy-tests", "utf8");
+	fs.writeFileSync(subInputPath, "not-a-real-calibration-file", "utf8");
 
 	const manualInput = await executeNode(ISPInput, {
 		items: [{ json: {} }],
 		params: {
 			fileSource: "auto",
-			inputFilesJson: JSON.stringify({ raw: inputPath }),
+			mainInputFilesJson: JSON.stringify({ raw: inputPath }),
+			subInputFilesJson: JSON.stringify({ calibration: subInputPath }),
 		},
 	});
 	const manualItem = manualInput[0][0];
 	assert(manualItem.json.files.raw === inputPath, "manual ISPInput should create files.raw");
-	assert(manualItem.json.originalFiles.raw === inputPath, "manual ISPInput should create originalFiles.raw");
+	assert(manualItem.json.mainFiles.raw === inputPath, "manual ISPInput should create mainFiles.raw");
+	assert(manualItem.json.subFiles.calibration === subInputPath, "manual ISPInput should create subFiles.calibration");
+	assert(manualItem.json.originalMainFiles.raw === inputPath, "manual ISPInput should create originalMainFiles.raw");
+	assert(
+		manualItem.json.originalSubFiles.calibration === subInputPath,
+		"manual ISPInput should create originalSubFiles.calibration",
+	);
 
 	const webhookInput = await executeNode(ISPInput, {
-		items: [{ json: { body: { files: { raw: "C:/images/webhook.png" } } } }],
+		items: [{ json: { body: { mainFiles: { raw: "C:/images/webhook.png" }, subFiles: { calibration: "C:/images/cal.png" } } } }],
 		params: {
 			fileSource: "auto",
 			inputFilesJson: '{ "raw": "C:/images/fallback.png" }',
 		},
 	});
 	assert(webhookInput[0][0].json.files.raw === "C:/images/webhook.png", "ISPInput should prefer webhook body.files");
+	assert(
+		webhookInput[0][0].json.subFiles.calibration === "C:/images/cal.png",
+		"ISPInput should prefer webhook body.subFiles",
+	);
 
 	const procA = await executeNode(ISPBlock, {
 		items: [manualItem],
@@ -138,8 +151,12 @@ async function testISPManualAndWebhookFlow() {
 	});
 	const procAItem = procA[0][0];
 	const expectedProcAPath = path.join(tmpDir, "input_ProcA.png");
+	const expectedProcASubPath = path.join(tmpDir, "calibration_ProcA.png");
 	assert(procAItem.json.files.raw === expectedProcAPath, "ProcA output path mismatch");
+	assert(procAItem.json.mainFiles.raw === expectedProcAPath, "ProcA mainFiles output path mismatch");
+	assert(procAItem.json.subFiles.calibration === expectedProcASubPath, "ProcA subFiles output path mismatch");
 	assert(fs.existsSync(expectedProcAPath), "ProcA should create output file");
+	assert(fs.existsSync(expectedProcASubPath), "ProcA should create sub output file");
 	assert(procAItem.json.globalInput.gain === 1.5, "ISPBlock should read shared global gain");
 	assert(procAItem.json.blockReadme.includes("ProcA"), "ProcA README should be included in output");
 	assert(procAItem.json.processingResult.ran === true, "ProcA process.py should run");
@@ -159,11 +176,18 @@ async function testISPManualAndWebhookFlow() {
 	});
 	const procBItem = procB[0][0];
 	const expectedProcBPath = path.join(tmpDir, "input_ProcB.png");
+	const expectedProcBSubPath = path.join(tmpDir, "calibration_ProcB.png");
 	assert(procBItem.json.files.raw === expectedProcBPath, "ProcB output path mismatch");
+	assert(procBItem.json.subFiles.calibration === expectedProcBSubPath, "ProcB subFiles output path mismatch");
 	assert(fs.existsSync(expectedProcBPath), "ProcB should create output file");
+	assert(fs.existsSync(expectedProcBSubPath), "ProcB should create sub output file");
 	assert(
-		procBItem.json.ispHistory[1].inputFiles.raw === expectedProcAPath,
+		procBItem.json.ispHistory[1].mainInputFiles.raw === expectedProcAPath,
 		"ProcB history should record ProcA output as input",
+	);
+	assert(
+		procBItem.json.ispHistory[1].subInputFiles.calibration === expectedProcASubPath,
+		"ProcB history should record ProcA sub output as input",
 	);
 	assert(procBItem.json.processingResult.ran === true, "ProcB process.py should run");
 
@@ -226,6 +250,7 @@ async function testWorkflowShape() {
 		"n8n-nodes-base.merge",
 		"CUSTOM.ispInput",
 		"CUSTOM.ispBlock",
+		"N8N_CONCURRENCY_PRODUCTION_LIMIT",
 	]) {
 		assert(startScript.includes(required), `start script should allow ${required}`);
 	}

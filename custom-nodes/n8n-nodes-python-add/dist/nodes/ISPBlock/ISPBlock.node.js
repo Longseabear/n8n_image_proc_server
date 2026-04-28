@@ -89,7 +89,19 @@ function makeOutputPath(inputPath, blockName, outputDirectory) {
 	return outputDirectory ? path.join(outputDirectory, outputName) : path.join(parsed.dir, outputName);
 }
 
-function runProcessorScript({ blockPath, blockName, files, outputFiles, originalFiles, globalInput, options, pythonCommand }) {
+function runProcessorScript({
+	blockPath,
+	blockName,
+	mainFiles,
+	subFiles,
+	outputMainFiles,
+	outputSubFiles,
+	originalMainFiles,
+	originalSubFiles,
+	globalInput,
+	options,
+	pythonCommand,
+}) {
 	const scriptPath = path.join(blockPath, "process.py");
 	if (!fs.existsSync(scriptPath)) {
 		return {
@@ -100,14 +112,20 @@ function runProcessorScript({ blockPath, blockName, files, outputFiles, original
 
 	const payload = {
 		blockName,
-		inputFiles: files,
-		outputFiles,
-		originalFiles,
+		inputFiles: mainFiles,
+		outputFiles: outputMainFiles,
+		originalFiles: originalMainFiles,
+		mainInputFiles: mainFiles,
+		subInputFiles: subFiles,
+		outputMainFiles,
+		outputSubFiles,
+		originalMainFiles,
+		originalSubFiles,
 		globalInput,
 		options,
 	};
 
-	for (const outputPath of Object.values(outputFiles)) {
+	for (const outputPath of [...Object.values(outputMainFiles), ...Object.values(outputSubFiles)]) {
 		const outputDirectory = path.dirname(String(outputPath));
 		if (outputDirectory) {
 			fs.mkdirSync(outputDirectory, { recursive: true });
@@ -122,6 +140,8 @@ function runProcessorScript({ blockPath, blockName, files, outputFiles, original
 			...process.env,
 			PYTHONUTF8: "1",
 			PYTHONIOENCODING: "utf-8",
+			PYTHONPATH: [path.join(getIspRoot(), "_lib"), process.env.PYTHONPATH].filter(Boolean).join(path.delimiter),
+			ISP_ROOT: getIspRoot(),
 		},
 	});
 
@@ -262,6 +282,10 @@ class ISPBlock {
 		const returnData = [];
 		const ispRoot = getIspRoot();
 
+		if (items.length > 1) {
+			throw new NodeOperationError(this.getNode(), "ISPBlock only supports one item per execution to protect memory.");
+		}
+
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
 			const blockName = this.getNodeParameter("blockName", itemIndex);
 			const inputFilesJson = this.getNodeParameter("inputFilesJson", itemIndex);
@@ -286,18 +310,32 @@ class ISPBlock {
 				throw new NodeOperationError(this.getNode(), `Unknown ISP block folder: ${blockName}`, { itemIndex });
 			}
 
-			let files;
+			let mainFiles;
+			let subFiles;
 			try {
-				files = normalizeFileMap(items[itemIndex].json.files || safeParseJson(inputFilesJson, {}, "Input Files JSON"));
+				mainFiles = normalizeFileMap(
+					items[itemIndex].json.mainFiles ||
+						items[itemIndex].json.files ||
+						safeParseJson(inputFilesJson, {}, "Input Files JSON"),
+				);
+				subFiles = normalizeFileMap(items[itemIndex].json.subFiles || {}, "Sub input files");
 			} catch (error) {
 				throw new NodeOperationError(this.getNode(), error.message, { itemIndex });
 			}
 
-			const originalFiles = items[itemIndex].json.originalFiles || files;
-			const outputFiles = {};
+			const originalMainFiles = items[itemIndex].json.originalMainFiles || items[itemIndex].json.originalFiles || mainFiles;
+			const originalSubFiles = items[itemIndex].json.originalSubFiles || subFiles;
+			const originalFiles = originalMainFiles;
+			const outputMainFiles = {};
+			const outputSubFiles = {};
+			const outputFiles = outputMainFiles;
 
-			for (const [name, filePath] of Object.entries(originalFiles)) {
-				outputFiles[name] = makeOutputPath(filePath, blockName, outputDirectory);
+			for (const [name, filePath] of Object.entries(originalMainFiles)) {
+				outputMainFiles[name] = makeOutputPath(filePath, blockName, outputDirectory);
+			}
+
+			for (const [name, filePath] of Object.entries(originalSubFiles)) {
+				outputSubFiles[name] = makeOutputPath(filePath, blockName, outputDirectory);
 			}
 
 			const readmePath = path.join(blockPath, "README.md");
@@ -312,9 +350,12 @@ class ISPBlock {
 					processingResult = runProcessorScript({
 						blockPath,
 						blockName,
-						files,
-						outputFiles,
-						originalFiles,
+						mainFiles,
+						subFiles,
+						outputMainFiles,
+						outputSubFiles,
+						originalMainFiles,
+						originalSubFiles,
 						globalInput,
 						pythonCommand,
 						options: {
@@ -329,21 +370,29 @@ class ISPBlock {
 				}
 			}
 
-			console.log(`[ISPBlock:${blockName}] files=${JSON.stringify(files)} global=${JSON.stringify(globalInput)}`);
+			console.log(`[ISPBlock:${blockName}] mainFiles=${JSON.stringify(mainFiles)} subFiles=${JSON.stringify(subFiles)} global=${JSON.stringify(globalInput)}`);
 
 			returnData.push({
 				json: {
 					...items[itemIndex].json,
-					files: outputFiles,
+					files: outputMainFiles,
+					mainFiles: outputMainFiles,
+					subFiles: outputSubFiles,
 					originalFiles,
+					originalMainFiles,
+					originalSubFiles,
 					lastBlock: blockName,
 					globalInput,
 					ispHistory: [
 						...(items[itemIndex].json.ispHistory || []),
 						{
 							blockName,
-							inputFiles: files,
+							inputFiles: mainFiles,
+							mainInputFiles: mainFiles,
+							subInputFiles: subFiles,
 							outputFiles,
+							outputMainFiles,
+							outputSubFiles,
 							globalInput,
 							readmePath,
 							processingResult,

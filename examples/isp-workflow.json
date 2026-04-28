@@ -34,7 +34,8 @@
       {
         "parameters": {
           "fileSource": "auto",
-          "inputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}"
+          "mainInputFilesJson": "{\n  \"raw\": \"C:/images/input.png\"\n}",
+          "subInputFilesJson": "{\n  \"calibration\": \"C:/images/calibration.png\"\n}"
         },
         "id": "isp-input",
         "name": "ISP Input",

@@ -62,11 +62,18 @@ class ISPInput {
 					description: "Auto uses incoming files, webhook body.files, then the parameter fallback",
 				},
 				{
-					displayName: "Input Files JSON",
-					name: "inputFilesJson",
+					displayName: "Main Input Files JSON",
+					name: "mainInputFilesJson",
 					type: "json",
 					default: "{\n  \"raw\": \"C:/images/input.png\"\n}",
-					description: "Shape: key=name, value=file path",
+					description: "Main input file map. Shape: key=name, value=file path",
+				},
+				{
+					displayName: "Sub Input Files JSON",
+					name: "subInputFilesJson",
+					type: "json",
+					default: "{}",
+					description: "Sub input file map. Shape: key=name, value=file path",
 				},
 			],
 		};
@@ -77,18 +84,44 @@ class ISPInput {
 		const sourceItems = items.length > 0 ? items : [{ json: {} }];
 		const returnData = [];
 
+		if (sourceItems.length > 1) {
+			throw new NodeOperationError(this.getNode(), "ISPInput only supports one item per execution to protect memory.");
+		}
+
 		for (let itemIndex = 0; itemIndex < sourceItems.length; itemIndex += 1) {
 			const sourceJson = sourceItems[itemIndex].json || {};
 			const fileSource = this.getNodeParameter("fileSource", itemIndex);
-			let files;
+			let mainFiles;
+			let subFiles;
 			try {
 				if (fileSource === "inputJson") {
-					files = normalizeFileMap(sourceJson.files || sourceJson.body?.files, "Incoming files");
+					mainFiles = normalizeFileMap(
+						sourceJson.mainFiles || sourceJson.files || sourceJson.body?.mainFiles || sourceJson.body?.files,
+						"Incoming main files",
+					);
+					subFiles = normalizeFileMap(sourceJson.subFiles || sourceJson.body?.subFiles || {}, "Incoming sub files");
 				} else if (fileSource === "parameter") {
-					files = parseFileMap(this.getNodeParameter("inputFilesJson", itemIndex));
+					mainFiles = parseFileMap(
+						this.getNodeParameter("mainInputFilesJson", itemIndex) ??
+							this.getNodeParameter("inputFilesJson", itemIndex),
+					);
+					subFiles = parseFileMap(this.getNodeParameter("subInputFilesJson", itemIndex) || "{}");
 				} else {
-					files = sourceJson.files || sourceJson.body?.files || parseFileMap(this.getNodeParameter("inputFilesJson", itemIndex));
-					files = normalizeFileMap(files, "Incoming files");
+					mainFiles =
+						sourceJson.mainFiles ||
+						sourceJson.files ||
+						sourceJson.body?.mainFiles ||
+						sourceJson.body?.files ||
+						parseFileMap(
+							this.getNodeParameter("mainInputFilesJson", itemIndex) ??
+								this.getNodeParameter("inputFilesJson", itemIndex),
+						);
+					subFiles =
+						sourceJson.subFiles ||
+						sourceJson.body?.subFiles ||
+						parseFileMap(this.getNodeParameter("subInputFilesJson", itemIndex) || "{}");
+					mainFiles = normalizeFileMap(mainFiles, "Incoming main files");
+					subFiles = normalizeFileMap(subFiles, "Incoming sub files");
 				}
 			} catch (error) {
 				throw new NodeOperationError(this.getNode(), error.message, { itemIndex });
@@ -97,8 +130,12 @@ class ISPInput {
 			returnData.push({
 				json: {
 					...sourceJson,
-					files,
-					originalFiles: files,
+					files: mainFiles,
+					mainFiles,
+					subFiles,
+					originalFiles: mainFiles,
+					originalMainFiles: mainFiles,
+					originalSubFiles: subFiles,
 					ispHistory: [],
 				},
 				pairedItem: {
