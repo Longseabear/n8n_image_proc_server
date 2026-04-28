@@ -2,6 +2,8 @@ node_modules/
 .n8n-data/
 logs/
 exports/harness/
+__pycache__/
+*.pyc
 
 n8n.err.log
 n8n.out.log
