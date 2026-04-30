@@ -47,6 +47,9 @@ The node panel is limited to:
 
 - `Manual Trigger`
 - `Webhook`
+- `Chat Trigger`
+- `Manual Chat Trigger`
+- `Chat`
 - `Python Add`
 - `Pipeline A`
 - `Pipeline B`
@@ -56,6 +59,8 @@ The node panel is limited to:
 - `ISPInput`
 - `ISPBlock`
 - `ISPScript`
+
+The startup script disables n8n diagnostics, PostHog telemetry, version checks, templates, dynamic banners, personalization, and license auto-renew calls so the local server does not try to contact n8n cloud services during normal startup/editor use.
 
 `Python Add` takes `A` and `B`, runs a small Python calculation, and outputs `sum`.
 
