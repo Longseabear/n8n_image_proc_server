@@ -18,7 +18,7 @@ $env:N8N_CUSTOM_EXTENSIONS = (Join-Path $dataPath ".n8n\custom")
 $env:N8N_WORKSPACE_ROOT = $root
 $env:N8N_CONCURRENCY_PRODUCTION_LIMIT = "1"
 $env:PIPELINE_GLOBAL_PARAMETER = "global-from-start-script"
-$env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","n8n-nodes-base.webhook","n8n-nodes-base.set","n8n-nodes-base.code","n8n-nodes-base.merge","n8n-nodes-base.if","n8n-nodes-base.switch","n8n-nodes-base.noOp","n8n-nodes-base.stickyNote","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD","CUSTOM.presetScriptRunner","CUSTOM.ispInput","CUSTOM.ispBlock","CUSTOM.ispScript"]'
+$env:NODES_INCLUDE = '["n8n-nodes-base.manualTrigger","n8n-nodes-base.webhook","n8n-nodes-base.set","n8n-nodes-base.code","n8n-nodes-base.merge","n8n-nodes-base.if","n8n-nodes-base.switch","n8n-nodes-base.noOp","n8n-nodes-base.stickyNote","@n8n/n8n-nodes-langchain.chatTrigger","@n8n/n8n-nodes-langchain.manualChatTrigger","@n8n/n8n-nodes-langchain.chat","CUSTOM.pythonAdd","CUSTOM.pipelineA","CUSTOM.pipelineB","CUSTOM.pipelineC","CUSTOM.pipelineD","CUSTOM.presetScriptRunner","CUSTOM.ispInput","CUSTOM.ispBlock","CUSTOM.ispScript"]'
 
 Write-Host "Starting n8n"
 Write-Host "Data path: $dataPath"
