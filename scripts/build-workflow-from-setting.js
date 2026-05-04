@@ -12,6 +12,45 @@ const nodeKinds = {
     typeVersion: 1,
     parameters: {},
   },
+  webhook: {
+    type: 'n8n-nodes-base.webhook',
+    typeVersion: 2,
+    buildParameters(node) {
+      return {
+        httpMethod: node.httpMethod || 'POST',
+        path: node.path || slug(node.name),
+        responseMode: node.responseMode || 'onReceived',
+        options: node.options || {},
+      };
+    },
+  },
+  respondToWebhook: {
+    type: 'n8n-nodes-base.respondToWebhook',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        respondWith: node.respondWith || 'json',
+        responseBody: node.responseBody || '={{ $json }}',
+        options: node.options || {},
+      };
+    },
+  },
+  scheduleTrigger: {
+    type: 'n8n-nodes-base.scheduleTrigger',
+    typeVersion: 1.2,
+    buildParameters(node) {
+      return {
+        rule: node.rule || {
+          interval: [
+            {
+              field: node.field || 'minutes',
+              minutesInterval: node.minutesInterval || 5,
+            },
+          ],
+        },
+      };
+    },
+  },
   set: {
     type: 'n8n-nodes-base.set',
     typeVersion: 2,
@@ -29,6 +68,20 @@ const nodeKinds = {
       };
     },
   },
+  httpRequest: {
+    type: 'n8n-nodes-base.httpRequest',
+    typeVersion: 4.2,
+    buildParameters(node) {
+      return {
+        method: node.method || 'GET',
+        url: node.url || 'https://example.com',
+        sendBody: Boolean(node.body || node.jsonBody),
+        contentType: node.contentType || 'json',
+        jsonBody: node.jsonBody || (node.body ? JSON.stringify(node.body, null, 2) : undefined),
+        options: node.options || {},
+      };
+    },
+  },
   code: {
     type: 'n8n-nodes-base.code',
     typeVersion: 2,
@@ -37,6 +90,34 @@ const nodeKinds = {
         mode: node.mode || 'runOnceForAllItems',
         language: node.language || 'javaScript',
         jsCode: node.jsCode || 'return $input.all();',
+      };
+    },
+  },
+  if: {
+    type: 'n8n-nodes-base.if',
+    typeVersion: 2,
+    buildParameters(node) {
+      return node.parameters || {
+        conditions: node.conditions || {
+          options: {
+            caseSensitive: true,
+            leftValue: '',
+            typeValidation: 'strict',
+          },
+          conditions: [],
+          combinator: 'and',
+        },
+        options: node.options || {},
+      };
+    },
+  },
+  switch: {
+    type: 'n8n-nodes-base.switch',
+    typeVersion: 3,
+    buildParameters(node) {
+      return node.parameters || {
+        rules: node.rules || { values: [] },
+        options: node.options || {},
       };
     },
   },
@@ -49,6 +130,132 @@ const nodeKinds = {
       };
     },
   },
+  noOp: {
+    type: 'n8n-nodes-base.noOp',
+    typeVersion: 1,
+    parameters: {},
+  },
+  stickyNote: {
+    type: 'n8n-nodes-base.stickyNote',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        content: node.content || node.text || '',
+        height: node.height || 160,
+        width: node.width || 240,
+        color: node.color || 1,
+      };
+    },
+  },
+  chatTrigger: {
+    type: '@n8n/n8n-nodes-langchain.chatTrigger',
+    typeVersion: 1.1,
+    parameters: {},
+  },
+  manualChatTrigger: {
+    type: '@n8n/n8n-nodes-langchain.manualChatTrigger',
+    typeVersion: 1,
+    parameters: {},
+  },
+  chat: {
+    type: '@n8n/n8n-nodes-langchain.chat',
+    typeVersion: 1,
+    buildParameters(node) {
+      return node.parameters || {};
+    },
+  },
+  pythonAdd: {
+    type: 'CUSTOM.pythonAdd',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        a: node.a ?? 1,
+        b: node.b ?? 2,
+        pythonCommand: node.pythonCommand || 'python',
+      };
+    },
+  },
+  pipelineA: {
+    type: 'CUSTOM.pipelineA',
+    typeVersion: 1,
+    parameters: {},
+  },
+  pipelineB: {
+    type: 'CUSTOM.pipelineB',
+    typeVersion: 1,
+    parameters: {},
+  },
+  pipelineC: {
+    type: 'CUSTOM.pipelineC',
+    typeVersion: 1,
+    parameters: {},
+  },
+  pipelineD: {
+    type: 'CUSTOM.pipelineD',
+    typeVersion: 1,
+    parameters: {},
+  },
+  presetScriptRunner: {
+    type: 'CUSTOM.presetScriptRunner',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        preset: node.preset || 'append-a.json',
+        initialValue: node.initialValue || 'input-',
+        pythonCommand: node.pythonCommand || 'python',
+      };
+    },
+  },
+  ispInput: {
+    type: 'CUSTOM.ispInput',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        fileSource: node.fileSource || 'auto',
+        mainInputFilesJson: JSON.stringify(node.mainInputFiles || { raw: 'C:/images/input.png' }, null, 2),
+        subInputFilesJson: JSON.stringify(node.subInputFiles || {}, null, 2),
+      };
+    },
+  },
+  ispBlock: {
+    type: 'CUSTOM.ispBlock',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        blockName: node.blockName || 'ProcA',
+        inputFilesJson: JSON.stringify(node.inputFiles || {}, null, 2),
+        outputDirectory: node.outputDirectory || '',
+        runProcessor: node.runProcessor !== false,
+        pythonCommand: node.pythonCommand || 'python',
+        requireInputFiles: Boolean(node.requireInputFiles),
+        processorTimeoutMs: node.processorTimeoutMs || 30000,
+        includeReadme: node.includeReadme !== false,
+      };
+    },
+  },
+  ispScript: {
+    type: 'CUSTOM.ispScript',
+    typeVersion: 1,
+    buildParameters(node) {
+      return {
+        algorithmName: node.algorithmName || 'ScriptA',
+        pythonCommand: node.pythonCommand || 'python',
+        timeoutMs: node.timeoutMs || 30000,
+      };
+    },
+  },
+};
+
+const aliases = {
+  manual: 'manualTrigger',
+  trigger: 'manualTrigger',
+  editFields: 'set',
+  noop: 'noOp',
+  note: 'stickyNote',
+  sticky: 'stickyNote',
+  response: 'respondToWebhook',
+  schedule: 'scheduleTrigger',
+  http: 'httpRequest',
 };
 
 function readJson(filePath) {
@@ -72,12 +279,28 @@ function buildNode(node, index) {
     throw new Error(`Node at index ${index} is missing "name".`);
   }
 
-  const kind = node.kind || node.type;
+  const requestedKind = node.kind || node.type;
+  const kind = aliases[requestedKind] || requestedKind;
   const template = nodeKinds[kind];
 
   if (!template) {
+    if (node.type && node.parameters) {
+      const x = Number.isFinite(node.x) ? node.x : 260 + index * 260;
+      const y = Number.isFinite(node.y) ? node.y : 300;
+
+      return {
+        parameters: node.parameters,
+        id: node.id || slug(node.name) || `node-${index + 1}`,
+        name: node.name,
+        type: node.type,
+        typeVersion: node.typeVersion || 1,
+        position: [x, y],
+        ...(node.webhookId ? { webhookId: node.webhookId } : {}),
+      };
+    }
+
     throw new Error(
-      `Unknown node kind "${kind}" for "${node.name}". Supported kinds: ${Object.keys(nodeKinds).join(', ')}`
+      `Unknown node kind "${kind}" for "${node.name}". Supported kinds: ${Object.keys(nodeKinds).join(', ')}. For unsupported nodes, provide raw "type", "typeVersion", and "parameters".`
     );
   }
 
@@ -90,8 +313,9 @@ function buildNode(node, index) {
     id: node.id || slug(node.name) || `node-${index + 1}`,
     name: node.name,
     type: template.type,
-    typeVersion: template.typeVersion,
+    typeVersion: node.typeVersion || template.typeVersion,
     position: [x, y],
+    ...(node.webhookId ? { webhookId: node.webhookId } : {}),
   };
 }
 

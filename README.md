@@ -47,6 +47,9 @@ The node panel is limited to:
 
 - `Manual Trigger`
 - `Webhook`
+- `Respond to Webhook`
+- `Schedule Trigger`
+- `HTTP Request`
 - `Chat Trigger`
 - `Manual Chat Trigger`
 - `Chat`
@@ -221,9 +224,51 @@ The harness checks JSON files, custom node package registrations, `ISPInput` man
 The generator currently supports:
 
 - `manualTrigger`
+- `webhook`
+- `respondToWebhook`
+- `scheduleTrigger`
 - `set`
+- `httpRequest`
 - `code`
+- `if`
+- `switch`
 - `merge`
+- `noOp`
+- `stickyNote`
+- `chatTrigger`
+- `manualChatTrigger`
+- `chat`
+- `pythonAdd`
+- `pipelineA`
+- `pipelineB`
+- `pipelineC`
+- `pipelineD`
+- `presetScriptRunner`
+- `ispInput`
+- `ispBlock`
+- `ispScript`
+
+Aliases are also available for common names:
+
+- `manual` -> `manualTrigger`
+- `trigger` -> `manualTrigger`
+- `editFields` -> `set`
+- `http` -> `httpRequest`
+- `schedule` -> `scheduleTrigger`
+- `response` -> `respondToWebhook`
+- `noop` -> `noOp`
+- `note` / `sticky` -> `stickyNote`
+
+For an n8n node that does not have a shortcut yet, use raw n8n JSON fields directly:
+
+```json
+{
+  "name": "Raw Node",
+  "type": "n8n-nodes-base.someNode",
+  "typeVersion": 1,
+  "parameters": {}
+}
+```
 
 Example `workflow-source/setting.json`:
 

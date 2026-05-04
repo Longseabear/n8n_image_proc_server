@@ -32,9 +32,52 @@ npm run sync:workflow
 Supported `kind` values:
 
 - `manualTrigger`
+- `webhook`
+- `respondToWebhook`
+- `scheduleTrigger`
 - `set`
+- `httpRequest`
 - `code`
+- `if`
+- `switch`
 - `merge`
+- `noOp`
+- `stickyNote`
+- `chatTrigger`
+- `manualChatTrigger`
+- `chat`
+- `pythonAdd`
+- `pipelineA`
+- `pipelineB`
+- `pipelineC`
+- `pipelineD`
+- `presetScriptRunner`
+- `ispInput`
+- `ispBlock`
+- `ispScript`
+
+Aliases:
+
+- `manual` and `trigger` use `manualTrigger`
+- `editFields` uses `set`
+- `http` uses `httpRequest`
+- `schedule` uses `scheduleTrigger`
+- `response` uses `respondToWebhook`
+- `noop` uses `noOp`
+- `note` and `sticky` use `stickyNote`
+
+If a node is not supported as a shortcut yet, provide raw n8n fields:
+
+```json
+{
+  "name": "Raw Node",
+  "type": "n8n-nodes-base.someNode",
+  "typeVersion": 1,
+  "parameters": {}
+}
+```
+
+Raw mode lets the workflow build continue while keeping the exact n8n parameters you copied from an exported workflow.
 
 Example:
 

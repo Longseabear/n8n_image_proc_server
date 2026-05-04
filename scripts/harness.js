@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
 process.env.N8N_WORKSPACE_ROOT = root;
@@ -279,6 +280,9 @@ async function testWorkflowShape() {
 	const startScript = fs.readFileSync(path.join(root, "scripts/start-n8n.ps1"), "utf8");
 	for (const required of [
 		"n8n-nodes-base.webhook",
+		"n8n-nodes-base.respondToWebhook",
+		"n8n-nodes-base.scheduleTrigger",
+		"n8n-nodes-base.httpRequest",
 		"n8n-nodes-base.code",
 		"n8n-nodes-base.merge",
 		"CUSTOM.ispInput",
@@ -292,6 +296,73 @@ async function testWorkflowShape() {
 	pass("ISP workflow shape and allowed nodes");
 }
 
+async function testWorkflowGeneratorCommonNodes() {
+	const tmpDir = path.join(root, "exports", "harness");
+	const settingPath = path.join(tmpDir, "generator-setting.json");
+	const outputPath = path.join(tmpDir, "generator-workflow.json");
+	fs.mkdirSync(tmpDir, { recursive: true });
+	fs.writeFileSync(
+		settingPath,
+		JSON.stringify(
+			{
+				name: "Harness Generated Workflow",
+				output: "exports/harness/generator-workflow.json",
+				nodes: [
+					{
+						name: "Webhook In",
+						kind: "webhook",
+						path: "harness-webhook",
+						responseMode: "responseNode",
+					},
+					{
+						name: "Respond",
+						kind: "respondToWebhook",
+					},
+					{
+						name: "Raw Passthrough",
+						type: "n8n-nodes-base.noOp",
+						typeVersion: 1,
+						parameters: {},
+					},
+				],
+				connections: [
+					{
+						from: "Webhook In",
+						to: "Respond",
+					},
+					{
+						from: "Respond",
+						to: "Raw Passthrough",
+					},
+				],
+			},
+			null,
+			2,
+		),
+		"utf8",
+	);
+
+	execFileSync(process.execPath, ["scripts/build-workflow-from-setting.js", "exports/harness/generator-setting.json"], {
+		cwd: root,
+		stdio: "pipe",
+	});
+
+	const workflow = JSON.parse(fs.readFileSync(outputPath, "utf8"))[0];
+	const nodesByName = Object.fromEntries(workflow.nodes.map((node) => [node.name, node]));
+	assert(nodesByName["Webhook In"].type === "n8n-nodes-base.webhook", "generator should support webhook");
+	assert(
+		nodesByName.Respond.type === "n8n-nodes-base.respondToWebhook",
+		"generator should support respondToWebhook",
+	);
+	assert(nodesByName["Raw Passthrough"].type === "n8n-nodes-base.noOp", "generator should support raw node JSON");
+	assert(
+		workflow.connections["Webhook In"].main[0][0].node === "Respond",
+		"generated webhook should connect to response node",
+	);
+
+	pass("workflow generator common nodes and raw fallback");
+}
+
 async function main() {
 	const tests = [
 		testJsonFiles,
@@ -301,6 +372,7 @@ async function main() {
 		testPythonAdd,
 		testISPScript,
 		testWorkflowShape,
+		testWorkflowGeneratorCommonNodes,
 	];
 
 	for (const test of tests) {
