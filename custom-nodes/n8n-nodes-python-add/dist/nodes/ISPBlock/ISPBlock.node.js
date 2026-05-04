@@ -119,7 +119,6 @@ function runProcessorScript({
 	blockPath,
 	blockName,
 	version,
-	versionPath,
 	mainFiles,
 	subFiles,
 	outputMainFiles,
@@ -141,7 +140,6 @@ function runProcessorScript({
 	const payload = {
 		blockName,
 		version,
-		versionPath,
 		inputFiles: mainFiles,
 		outputFiles: outputMainFiles,
 		originalFiles: originalMainFiles,
@@ -235,8 +233,8 @@ class ISPBlock {
 					typeOptions: {
 						loadOptionsMethod: "getVersions",
 					},
-					default: "default",
-					description: "The version folder under ISPBlock/<Block>/versions to use. The selected value is passed to process.py as payload.version.",
+					default: "",
+					description: "The version folder under ISPBlock/<Block>/versions to use. The selected folder name is passed to process.py as payload.version.",
 				},
 				{
 					displayName: "Input Files JSON",
@@ -315,18 +313,7 @@ class ISPBlock {
 				},
 				async getVersions() {
 					const blockName = this.getCurrentNodeParameter("blockName") || "ProcA";
-					const versions = listVersions(blockName);
-					if (versions.length > 0) {
-						return versions;
-					}
-
-					return [
-						{
-							name: "default",
-							value: "default",
-							description: `No versions found for ${blockName}; create ISPBlock/${blockName}/versions/default.`,
-						},
-					];
+					return listVersions(blockName);
 				},
 			},
 		};
@@ -343,7 +330,7 @@ class ISPBlock {
 
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
 			const blockName = this.getNodeParameter("blockName", itemIndex);
-			const version = this.getNodeParameter("version", itemIndex) || "default";
+			const version = this.getNodeParameter("version", itemIndex);
 			const inputFilesJson = this.getNodeParameter("inputFilesJson", itemIndex);
 			const outputDirectory = this.getNodeParameter("outputDirectory", itemIndex);
 			const runProcessor = this.getNodeParameter("runProcessor", itemIndex);
@@ -365,8 +352,11 @@ class ISPBlock {
 			if (!fs.existsSync(blockPath) || !fs.statSync(blockPath).isDirectory()) {
 				throw new NodeOperationError(this.getNode(), `Unknown ISP block folder: ${blockName}`, { itemIndex });
 			}
-			const versionPath = path.join(blockPath, "versions", version);
-			if (!fs.existsSync(versionPath) || !fs.statSync(versionPath).isDirectory()) {
+			if (!version) {
+				throw new NodeOperationError(this.getNode(), `ISP block version is required for ${blockName}`, { itemIndex });
+			}
+			const versionDirectory = path.join(blockPath, "versions", version);
+			if (!fs.existsSync(versionDirectory) || !fs.statSync(versionDirectory).isDirectory()) {
 				throw new NodeOperationError(this.getNode(), `Unknown ISP block version: ${blockName}/${version}`, { itemIndex });
 			}
 
@@ -411,7 +401,6 @@ class ISPBlock {
 						blockPath,
 						blockName,
 						version,
-						versionPath,
 						mainFiles,
 						subFiles,
 						outputMainFiles,
@@ -445,14 +434,12 @@ class ISPBlock {
 					originalSubFiles,
 					lastBlock: blockName,
 					version,
-					versionPath,
 					globalInput,
 					ispHistory: [
 						...(items[itemIndex].json.ispHistory || []),
 						{
 							blockName,
 							version,
-							versionPath,
 							inputFiles: mainFiles,
 							mainInputFiles: mainFiles,
 							subInputFiles: subFiles,

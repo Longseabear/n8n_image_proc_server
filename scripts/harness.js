@@ -102,6 +102,20 @@ async function testCustomNodePackage() {
 async function testISPManualAndWebhookFlow() {
 	const { ISPInput } = require("../custom-nodes/n8n-nodes-python-add/dist/nodes/ISPInput/ISPInput.node.js");
 	const { ISPBlock } = require("../custom-nodes/n8n-nodes-python-add/dist/nodes/ISPBlock/ISPBlock.node.js");
+	const ispBlockNode = new ISPBlock();
+	const procAVersions = await ispBlockNode.methods.loadOptions.getVersions.call({
+		getCurrentNodeParameter() {
+			return "ProcA";
+		},
+	});
+	const missingVersions = await ispBlockNode.methods.loadOptions.getVersions.call({
+		getCurrentNodeParameter() {
+			return "MissingBlock";
+		},
+	});
+	assert(procAVersions.some((version) => version.value === "default"), "ISPBlock should list version folders");
+	assert(missingVersions.length === 0, "ISPBlock should return an empty version list when versions are missing");
+
 	const tmpDir = path.join(root, "exports", "harness");
 	const inputPath = path.join(tmpDir, "input.png");
 	const subInputPath = path.join(tmpDir, "calibration.png");
@@ -164,8 +178,10 @@ async function testISPManualAndWebhookFlow() {
 	assert(fs.existsSync(expectedProcASubPath), "ProcA should create sub output file");
 	assert(procAItem.json.globalInput.gain === 1.5, "ISPBlock should read shared global gain");
 	assert(procAItem.json.version === "default", "ProcA should expose selected version");
+	assert(!("versionPath" in procAItem.json), "ProcA output should not expose versionPath");
 	assert(procAItem.json.processingResult.stdout.version === "default", "ProcA process.py should receive version");
 	assert(procAItem.json.ispHistory[0].version === "default", "ProcA history should record version");
+	assert(!("versionPath" in procAItem.json.ispHistory[0]), "ProcA history should not expose versionPath");
 	assert(procAItem.json.blockReadme.includes("ProcA"), "ProcA README should be included in output");
 	assert(procAItem.json.processingResult.ran === true, "ProcA process.py should run");
 
