@@ -335,6 +335,10 @@ async function testWorkflowGeneratorCommonNodes() {
 						kind: "custom_node",
 					},
 					{
+						name: "ISP Input Package Alias",
+						kind: "n8n-nodes-python-add.ISPInput",
+					},
+					{
 						name: "Raw Passthrough",
 						type: "n8n-nodes-base.noOp",
 						typeVersion: 1,
@@ -364,6 +368,10 @@ async function testWorkflowGeneratorCommonNodes() {
 					},
 					{
 						from: "ISPInput",
+						to: "ISP Input Package Alias",
+					},
+					{
+						from: "ISP Input Package Alias",
 						to: "Raw Passthrough",
 					},
 				],
@@ -396,6 +404,10 @@ async function testWorkflowGeneratorCommonNodes() {
 	);
 	assert(nodesByName["ISP Input Alias"].type === "CUSTOM.ispInput", "generator should support ISPInput alias");
 	assert(nodesByName.ISPInput.type === "CUSTOM.ispInput", "generator should infer custom_node from node name");
+	assert(
+		nodesByName["ISP Input Package Alias"].type === "CUSTOM.ispInput",
+		"generator should support package-style custom node alias",
+	);
 	assert(nodesByName["Raw Passthrough"].type === "n8n-nodes-base.noOp", "generator should support raw node JSON");
 	assert(
 		workflow.connections["Webhook In"].main[0][0].node === "Respond",

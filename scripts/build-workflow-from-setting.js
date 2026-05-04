@@ -376,22 +376,32 @@ const aliases = {
   ISPInput: 'ispInput',
   'ISP Input': 'ispInput',
   'CUSTOM.ispInput': 'ispInput',
+  'n8n-nodes-python-add.ISPInput': 'ispInput',
+  'n8n-nodes-python-add.ispInput': 'ispInput',
   ISPBlock: 'ispBlock',
   'ISP Block': 'ispBlock',
   'CUSTOM.ispBlock': 'ispBlock',
+  'n8n-nodes-python-add.ISPBlock': 'ispBlock',
+  'n8n-nodes-python-add.ispBlock': 'ispBlock',
   ISPScript: 'ispScript',
   'ISP Script': 'ispScript',
   'CUSTOM.ispScript': 'ispScript',
+  'n8n-nodes-python-add.ISPScript': 'ispScript',
+  'n8n-nodes-python-add.ispScript': 'ispScript',
   PythonAdd: 'pythonAdd',
   'Python Add': 'pythonAdd',
   'CUSTOM.pythonAdd': 'pythonAdd',
+  'n8n-nodes-python-add.PythonAdd': 'pythonAdd',
+  'n8n-nodes-python-add.pythonAdd': 'pythonAdd',
   PresetScriptRunner: 'presetScriptRunner',
   'Preset Script Runner': 'presetScriptRunner',
   'CUSTOM.presetScriptRunner': 'presetScriptRunner',
+  'n8n-nodes-python-add.PresetScriptRunner': 'presetScriptRunner',
+  'n8n-nodes-python-add.presetScriptRunner': 'presetScriptRunner',
 };
 
 const lowerAliases = Object.fromEntries(
-  Object.entries(aliases).map(([key, value]) => [key.toLowerCase().replace(/\s+/g, ''), value])
+  Object.entries(aliases).map(([key, value]) => [key.toLowerCase().replace(/[\s_-]+/g, ''), value])
 );
 
 function normalizeKind(kind) {
@@ -399,7 +409,7 @@ function normalizeKind(kind) {
     return aliases[kind];
   }
 
-  const compact = String(kind).toLowerCase().replace(/\s+/g, '');
+  const compact = String(kind).toLowerCase().replace(/[\s_-]+/g, '');
   return lowerAliases[compact] || kind;
 }
 
@@ -454,8 +464,16 @@ function buildNode(node, index) {
       };
     }
 
+    const requestedKind = node.kind || node.type;
     throw new Error(
-      `Unknown node kind "${kind}" for "${node.name}". Supported kinds: ${Object.keys(nodeKinds).join(', ')}. For unsupported nodes, provide raw "type", "typeVersion", and "parameters".`
+      [
+        `Unknown node kind "${kind}" for node "${node.name}" at nodes[${index}] in ${path.relative(root, settingPath)}.`,
+        `Original kind/type: ${JSON.stringify(requestedKind)}.`,
+        `Node JSON: ${JSON.stringify(node)}.`,
+        'For custom nodes, use kind "ISPInput", "ISPBlock", "ISPScript", or kind "custom_node" with name/displayName/nodeType/customType.',
+        'For unsupported n8n nodes, provide raw "type", "typeVersion", and "parameters".',
+        `Supported kinds: ${Object.keys(nodeKinds).join(', ')}.`,
+      ].join(' ')
     );
   }
 
