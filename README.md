@@ -238,6 +238,51 @@ The generator currently supports:
 - `chatTrigger`
 - `manualChatTrigger`
 - `chat`
+- `agent`
+- `agentTool`
+- `chainSummarization`
+- `chainLlm`
+- `chainRetrievalQa`
+- `sentimentAnalysis`
+- `informationExtractor`
+- `textClassifier`
+- `langChainCode`
+- `documentDefaultDataLoader`
+- `documentBinaryInputLoader`
+- `documentJsonInputLoader`
+- `embeddingsLemonade`
+- `embeddingsOllama`
+- `lmChatLemonade`
+- `lmChatOllama`
+- `lmLemonade`
+- `lmOllama`
+- `mcpClient`
+- `mcpClientTool`
+- `mcpTrigger`
+- `memoryBufferWindow`
+- `memoryManager`
+- `memoryChatRetriever`
+- `outputParserAutofixing`
+- `outputParserItemList`
+- `outputParserStructured`
+- `retrieverContextualCompression`
+- `retrieverVectorStore`
+- `retrieverMultiQuery`
+- `retrieverWorkflow`
+- `textSplitterCharacterTextSplitter`
+- `textSplitterRecursiveCharacterTextSplitter`
+- `textSplitterTokenSplitter`
+- `toolCalculator`
+- `toolCode`
+- `toolThink`
+- `toolVectorStore`
+- `toolWorkflow`
+- `vectorStoreInMemory`
+- `vectorStoreInMemoryInsert`
+- `vectorStoreInMemoryLoad`
+- `toolExecutor`
+- `modelSelector`
+- `guardrails`
 - `pythonAdd`
 - `pipelineA`
 - `pipelineB`
@@ -258,6 +303,13 @@ Aliases are also available for common names:
 - `response` -> `respondToWebhook`
 - `noop` -> `noOp`
 - `note` / `sticky` -> `stickyNote`
+- `aiAgent` -> `agent`
+- `basicLlmChain` / `llmChain` -> `chainLlm`
+- `langchainCode` / `lcCode` -> `langChainCode`
+- `simpleMemory` -> `memoryBufferWindow`
+- `ollama` / `ollamaChat` / `ollamaModel` / `ollamaEmbeddings` -> local Ollama nodes
+- `lemonadeChat` / `lemonadeModel` / `lemonadeEmbeddings` -> local Lemonade nodes
+- `simpleVectorStore` / `inMemoryVectorStore` -> `vectorStoreInMemory`
 
 For an n8n node that does not have a shortcut yet, use raw n8n JSON fields directly:
 

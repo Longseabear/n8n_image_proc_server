@@ -246,17 +246,162 @@ const nodeKinds = {
   },
 };
 
+const localLangChainKinds = [
+  'agent',
+  'agentTool',
+  'chainSummarization',
+  'chainLlm',
+  'chainRetrievalQa',
+  'sentimentAnalysis',
+  'informationExtractor',
+  'textClassifier',
+  'langChainCode',
+  'documentDefaultDataLoader',
+  'documentBinaryInputLoader',
+  'documentJsonInputLoader',
+  'embeddingsLemonade',
+  'embeddingsOllama',
+  'lmChatLemonade',
+  'lmChatOllama',
+  'lmLemonade',
+  'lmOllama',
+  'mcpClient',
+  'mcpClientTool',
+  'mcpTrigger',
+  'memoryBufferWindow',
+  'memoryManager',
+  'memoryChatRetriever',
+  'outputParserAutofixing',
+  'outputParserItemList',
+  'outputParserStructured',
+  'retrieverContextualCompression',
+  'retrieverVectorStore',
+  'retrieverMultiQuery',
+  'retrieverWorkflow',
+  'textSplitterCharacterTextSplitter',
+  'textSplitterRecursiveCharacterTextSplitter',
+  'textSplitterTokenSplitter',
+  'toolCalculator',
+  'toolCode',
+  'toolThink',
+  'toolVectorStore',
+  'toolWorkflow',
+  'vectorStoreInMemory',
+  'vectorStoreInMemoryInsert',
+  'vectorStoreInMemoryLoad',
+  'toolExecutor',
+  'modelSelector',
+  'guardrails',
+];
+
+for (const kind of localLangChainKinds) {
+  const langChainNodeName = kind === 'langChainCode' ? 'code' : kind;
+  nodeKinds[kind] = {
+    type: `@n8n/n8n-nodes-langchain.${langChainNodeName}`,
+    typeVersion: 1,
+    buildParameters(node) {
+      return node.parameters || {};
+    },
+  };
+}
+
 const aliases = {
   manual: 'manualTrigger',
+  'manual trigger': 'manualTrigger',
+  ManualTrigger: 'manualTrigger',
+  'Manual Trigger': 'manualTrigger',
   trigger: 'manualTrigger',
   editFields: 'set',
+  'Edit Fields': 'set',
+  Set: 'set',
   noop: 'noOp',
+  NoOp: 'noOp',
+  'No Op': 'noOp',
   note: 'stickyNote',
   sticky: 'stickyNote',
+  StickyNote: 'stickyNote',
+  'Sticky Note': 'stickyNote',
   response: 'respondToWebhook',
+  RespondToWebhook: 'respondToWebhook',
+  'Respond to Webhook': 'respondToWebhook',
   schedule: 'scheduleTrigger',
+  ScheduleTrigger: 'scheduleTrigger',
+  'Schedule Trigger': 'scheduleTrigger',
   http: 'httpRequest',
+  HttpRequest: 'httpRequest',
+  HTTPRequest: 'httpRequest',
+  'HTTP Request': 'httpRequest',
+  aiAgent: 'agent',
+  'AI Agent': 'agent',
+  basicLlmChain: 'chainLlm',
+  llmChain: 'chainLlm',
+  'Basic LLM Chain': 'chainLlm',
+  langchainCode: 'langChainCode',
+  lcCode: 'langChainCode',
+  'LangChain Code': 'langChainCode',
+  simpleMemory: 'memoryBufferWindow',
+  'Simple Memory': 'memoryBufferWindow',
+  ollamaChat: 'lmChatOllama',
+  'Ollama Chat': 'lmChatOllama',
+  'Ollama Chat Model': 'lmChatOllama',
+  ollama: 'lmChatOllama',
+  ollamaModel: 'lmOllama',
+  'Ollama Model': 'lmOllama',
+  ollamaEmbeddings: 'embeddingsOllama',
+  'Ollama Embeddings': 'embeddingsOllama',
+  lemonadeChat: 'lmChatLemonade',
+  'Lemonade Chat': 'lmChatLemonade',
+  'Lemonade Chat Model': 'lmChatLemonade',
+  lemonadeModel: 'lmLemonade',
+  'Lemonade Model': 'lmLemonade',
+  lemonadeEmbeddings: 'embeddingsLemonade',
+  'Lemonade Embeddings': 'embeddingsLemonade',
+  simpleVectorStore: 'vectorStoreInMemory',
+  inMemoryVectorStore: 'vectorStoreInMemory',
+  'Simple Vector Store': 'vectorStoreInMemory',
+  calculatorTool: 'toolCalculator',
+  Calculator: 'toolCalculator',
+  codeTool: 'toolCode',
+  'Code Tool': 'toolCode',
+  thinkTool: 'toolThink',
+  'Think Tool': 'toolThink',
+  workflowTool: 'toolWorkflow',
+  'Workflow Tool': 'toolWorkflow',
+  structuredOutputParser: 'outputParserStructured',
+  'Structured Output Parser': 'outputParserStructured',
+  itemListOutputParser: 'outputParserItemList',
+  'Item List Output Parser': 'outputParserItemList',
+  autofixingOutputParser: 'outputParserAutofixing',
+  'Auto-fixing Output Parser': 'outputParserAutofixing',
+  ISPInput: 'ispInput',
+  'ISP Input': 'ispInput',
+  'CUSTOM.ispInput': 'ispInput',
+  ISPBlock: 'ispBlock',
+  'ISP Block': 'ispBlock',
+  'CUSTOM.ispBlock': 'ispBlock',
+  ISPScript: 'ispScript',
+  'ISP Script': 'ispScript',
+  'CUSTOM.ispScript': 'ispScript',
+  PythonAdd: 'pythonAdd',
+  'Python Add': 'pythonAdd',
+  'CUSTOM.pythonAdd': 'pythonAdd',
+  PresetScriptRunner: 'presetScriptRunner',
+  'Preset Script Runner': 'presetScriptRunner',
+  'CUSTOM.presetScriptRunner': 'presetScriptRunner',
 };
+
+const lowerAliases = Object.fromEntries(
+  Object.entries(aliases).map(([key, value]) => [key.toLowerCase().replace(/\s+/g, ''), value])
+);
+
+function normalizeKind(kind) {
+  if (aliases[kind]) {
+    return aliases[kind];
+  }
+
+  const compact = String(kind).toLowerCase().replace(/\s+/g, '');
+  return lowerAliases[compact] || kind;
+}
 
 function readJson(filePath) {
   try {
@@ -280,7 +425,7 @@ function buildNode(node, index) {
   }
 
   const requestedKind = node.kind || node.type;
-  const kind = aliases[requestedKind] || requestedKind;
+  const kind = normalizeKind(requestedKind);
   const template = nodeKinds[kind];
 
   if (!template) {

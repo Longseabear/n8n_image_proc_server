@@ -46,6 +46,51 @@ Supported `kind` values:
 - `chatTrigger`
 - `manualChatTrigger`
 - `chat`
+- `agent`
+- `agentTool`
+- `chainSummarization`
+- `chainLlm`
+- `chainRetrievalQa`
+- `sentimentAnalysis`
+- `informationExtractor`
+- `textClassifier`
+- `langChainCode`
+- `documentDefaultDataLoader`
+- `documentBinaryInputLoader`
+- `documentJsonInputLoader`
+- `embeddingsLemonade`
+- `embeddingsOllama`
+- `lmChatLemonade`
+- `lmChatOllama`
+- `lmLemonade`
+- `lmOllama`
+- `mcpClient`
+- `mcpClientTool`
+- `mcpTrigger`
+- `memoryBufferWindow`
+- `memoryManager`
+- `memoryChatRetriever`
+- `outputParserAutofixing`
+- `outputParserItemList`
+- `outputParserStructured`
+- `retrieverContextualCompression`
+- `retrieverVectorStore`
+- `retrieverMultiQuery`
+- `retrieverWorkflow`
+- `textSplitterCharacterTextSplitter`
+- `textSplitterRecursiveCharacterTextSplitter`
+- `textSplitterTokenSplitter`
+- `toolCalculator`
+- `toolCode`
+- `toolThink`
+- `toolVectorStore`
+- `toolWorkflow`
+- `vectorStoreInMemory`
+- `vectorStoreInMemoryInsert`
+- `vectorStoreInMemoryLoad`
+- `toolExecutor`
+- `modelSelector`
+- `guardrails`
 - `pythonAdd`
 - `pipelineA`
 - `pipelineB`
@@ -65,6 +110,13 @@ Aliases:
 - `response` uses `respondToWebhook`
 - `noop` uses `noOp`
 - `note` and `sticky` use `stickyNote`
+- `aiAgent` uses `agent`
+- `basicLlmChain` and `llmChain` use `chainLlm`
+- `langchainCode` and `lcCode` use `langChainCode`
+- `simpleMemory` uses `memoryBufferWindow`
+- `ollama`, `ollamaChat`, `ollamaModel`, and `ollamaEmbeddings` use the local Ollama nodes
+- `lemonadeChat`, `lemonadeModel`, and `lemonadeEmbeddings` use the local Lemonade nodes
+- `simpleVectorStore` and `inMemoryVectorStore` use `vectorStoreInMemory`
 
 If a node is not supported as a shortcut yet, provide raw n8n fields:
 

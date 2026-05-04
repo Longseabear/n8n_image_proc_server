@@ -319,6 +319,18 @@ async function testWorkflowGeneratorCommonNodes() {
 						kind: "respondToWebhook",
 					},
 					{
+						name: "Ollama Chat",
+						kind: "ollamaChat",
+					},
+					{
+						name: "Simple Memory",
+						kind: "simpleMemory",
+					},
+					{
+						name: "ISP Input Alias",
+						kind: "ISPInput",
+					},
+					{
 						name: "Raw Passthrough",
 						type: "n8n-nodes-base.noOp",
 						typeVersion: 1,
@@ -332,6 +344,18 @@ async function testWorkflowGeneratorCommonNodes() {
 					},
 					{
 						from: "Respond",
+						to: "Ollama Chat",
+					},
+					{
+						from: "Ollama Chat",
+						to: "Simple Memory",
+					},
+					{
+						from: "Simple Memory",
+						to: "ISP Input Alias",
+					},
+					{
+						from: "ISP Input Alias",
 						to: "Raw Passthrough",
 					},
 				],
@@ -354,6 +378,15 @@ async function testWorkflowGeneratorCommonNodes() {
 		nodesByName.Respond.type === "n8n-nodes-base.respondToWebhook",
 		"generator should support respondToWebhook",
 	);
+	assert(
+		nodesByName["Ollama Chat"].type === "@n8n/n8n-nodes-langchain.lmChatOllama",
+		"generator should support Ollama LangChain aliases",
+	);
+	assert(
+		nodesByName["Simple Memory"].type === "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+		"generator should support local LangChain memory aliases",
+	);
+	assert(nodesByName["ISP Input Alias"].type === "CUSTOM.ispInput", "generator should support ISPInput alias");
 	assert(nodesByName["Raw Passthrough"].type === "n8n-nodes-base.noOp", "generator should support raw node JSON");
 	assert(
 		workflow.connections["Webhook In"].main[0][0].node === "Respond",
