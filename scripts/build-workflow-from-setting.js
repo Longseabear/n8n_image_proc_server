@@ -403,6 +403,17 @@ function normalizeKind(kind) {
   return lowerAliases[compact] || kind;
 }
 
+function resolveNodeKind(node) {
+  const requestedKind = node.kind || node.type;
+  const compactKind = String(requestedKind || '').toLowerCase().replace(/[_\s-]+/g, '');
+
+  if (compactKind === 'customnode') {
+    return normalizeKind(node.nodeType || node.customType || node.displayName || node.name);
+  }
+
+  return normalizeKind(requestedKind);
+}
+
 function readJson(filePath) {
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -424,8 +435,7 @@ function buildNode(node, index) {
     throw new Error(`Node at index ${index} is missing "name".`);
   }
 
-  const requestedKind = node.kind || node.type;
-  const kind = normalizeKind(requestedKind);
+  const kind = resolveNodeKind(node);
   const template = nodeKinds[kind];
 
   if (!template) {
