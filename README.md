@@ -105,12 +105,18 @@ ISPBlock/<BlockName>/process.py
 `ISPBlock` passes a JSON payload through stdin and reads optional JSON from stdout. Each `process.py` is a Python wrapper that can call a real executable. The example blocks use:
 
 ```text
-ISPBlock/ProcA/block.json
-ISPBlock/ProcB/block.json
+ISPBlock/ProcA/versions/default/block.json
+ISPBlock/ProcB/versions/default/block.json
 ISPBlock/_tools/mock_isp_exe.py
 ```
 
-Replace the `executable` and `args` in each `block.json` with the real `.exe` command later.
+Each block has a `versions/` folder. Select the version in the ISPBlock node UI. The selected version is passed to `process.py` as `payload.version`, and executable config is loaded from:
+
+```text
+ISPBlock/<BlockName>/versions/<VersionName>/block.json
+```
+
+Replace the `executable` and `args` in each version `block.json` with the real `.exe` command later.
 
 The ISP payload has separate main and sub inputs:
 

@@ -49,6 +49,7 @@
       {
         "parameters": {
           "blockName": "ProcA",
+          "version": "default",
           "inputFilesJson": "{}",
           "outputDirectory": "",
           "runProcessor": true,
@@ -69,6 +70,7 @@
       {
         "parameters": {
           "blockName": "ProcB",
+          "version": "default",
           "inputFilesJson": "{}",
           "outputDirectory": "",
           "runProcessor": true,

@@ -39,6 +39,32 @@ function listBlocks() {
 		});
 }
 
+function listVersions(blockName) {
+	const versionsRoot = path.join(getIspRoot(), blockName || "", "versions");
+	if (!fs.existsSync(versionsRoot)) {
+		return [];
+	}
+
+	return fs
+		.readdirSync(versionsRoot, { withFileTypes: true })
+		.filter((entry) => entry.isDirectory())
+		.map((entry) => {
+			const readmePath = path.join(versionsRoot, entry.name, "README.md");
+			const blockConfigPath = path.join(versionsRoot, entry.name, "block.json");
+			const description = fs.existsSync(readmePath)
+				? fs.readFileSync(readmePath, "utf8").split(/\r?\n/).find((line) => line.trim()) || entry.name
+				: fs.existsSync(blockConfigPath)
+					? `${entry.name}/block.json`
+					: entry.name;
+
+			return {
+				name: entry.name,
+				value: entry.name,
+				description,
+			};
+		});
+}
+
 function readGlobalInput() {
 	const globalPath = path.join(getIspRoot(), "global.json");
 	if (!fs.existsSync(globalPath)) {
@@ -92,6 +118,8 @@ function makeOutputPath(inputPath, blockName, outputDirectory) {
 function runProcessorScript({
 	blockPath,
 	blockName,
+	version,
+	versionPath,
 	mainFiles,
 	subFiles,
 	outputMainFiles,
@@ -112,6 +140,8 @@ function runProcessorScript({
 
 	const payload = {
 		blockName,
+		version,
+		versionPath,
 		inputFiles: mainFiles,
 		outputFiles: outputMainFiles,
 		originalFiles: originalMainFiles,
@@ -199,6 +229,16 @@ class ISPBlock {
 					description: "The ISP block folder to run. Choose from the list, or specify an ID using an expression.",
 				},
 				{
+					displayName: "Version Name or ID",
+					name: "version",
+					type: "options",
+					typeOptions: {
+						loadOptionsMethod: "getVersions",
+					},
+					default: "default",
+					description: "The version folder under ISPBlock/<Block>/versions to use. The selected value is passed to process.py as payload.version.",
+				},
+				{
 					displayName: "Input Files JSON",
 					name: "inputFilesJson",
 					type: "json",
@@ -273,6 +313,21 @@ class ISPBlock {
 				async getBlocks() {
 					return listBlocks();
 				},
+				async getVersions() {
+					const blockName = this.getCurrentNodeParameter("blockName") || "ProcA";
+					const versions = listVersions(blockName);
+					if (versions.length > 0) {
+						return versions;
+					}
+
+					return [
+						{
+							name: "default",
+							value: "default",
+							description: `No versions found for ${blockName}; create ISPBlock/${blockName}/versions/default.`,
+						},
+					];
+				},
 			},
 		};
 	}
@@ -288,6 +343,7 @@ class ISPBlock {
 
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
 			const blockName = this.getNodeParameter("blockName", itemIndex);
+			const version = this.getNodeParameter("version", itemIndex) || "default";
 			const inputFilesJson = this.getNodeParameter("inputFilesJson", itemIndex);
 			const outputDirectory = this.getNodeParameter("outputDirectory", itemIndex);
 			const runProcessor = this.getNodeParameter("runProcessor", itemIndex);
@@ -308,6 +364,10 @@ class ISPBlock {
 			const blockPath = path.join(ispRoot, blockName);
 			if (!fs.existsSync(blockPath) || !fs.statSync(blockPath).isDirectory()) {
 				throw new NodeOperationError(this.getNode(), `Unknown ISP block folder: ${blockName}`, { itemIndex });
+			}
+			const versionPath = path.join(blockPath, "versions", version);
+			if (!fs.existsSync(versionPath) || !fs.statSync(versionPath).isDirectory()) {
+				throw new NodeOperationError(this.getNode(), `Unknown ISP block version: ${blockName}/${version}`, { itemIndex });
 			}
 
 			let mainFiles;
@@ -350,6 +410,8 @@ class ISPBlock {
 					processingResult = runProcessorScript({
 						blockPath,
 						blockName,
+						version,
+						versionPath,
 						mainFiles,
 						subFiles,
 						outputMainFiles,
@@ -370,7 +432,7 @@ class ISPBlock {
 				}
 			}
 
-			console.log(`[ISPBlock:${blockName}] mainFiles=${JSON.stringify(mainFiles)} subFiles=${JSON.stringify(subFiles)} global=${JSON.stringify(globalInput)}`);
+			console.log(`[ISPBlock:${blockName}:${version}] mainFiles=${JSON.stringify(mainFiles)} subFiles=${JSON.stringify(subFiles)} global=${JSON.stringify(globalInput)}`);
 
 			returnData.push({
 				json: {
@@ -382,11 +444,15 @@ class ISPBlock {
 					originalMainFiles,
 					originalSubFiles,
 					lastBlock: blockName,
+					version,
+					versionPath,
 					globalInput,
 					ispHistory: [
 						...(items[itemIndex].json.ispHistory || []),
 						{
 							blockName,
+							version,
+							versionPath,
 							inputFiles: mainFiles,
 							mainInputFiles: mainFiles,
 							subInputFiles: subFiles,

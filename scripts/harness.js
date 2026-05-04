@@ -69,6 +69,8 @@ async function testJsonFiles() {
 		"examples/isp-workflow.json",
 		"examples/isp-script-workflow.json",
 		"ISPBlock/global.json",
+		"ISPBlock/ProcA/versions/default/block.json",
+		"ISPBlock/ProcB/versions/default/block.json",
 		"presets/append-a.json",
 		"presets/append-b.json",
 	];
@@ -142,6 +144,7 @@ async function testISPManualAndWebhookFlow() {
 		items: [manualItem],
 		params: {
 			blockName: "ProcA",
+			version: "default",
 			inputFilesJson: "{}",
 			outputDirectory: tmpDir,
 			runProcessor: true,
@@ -160,6 +163,9 @@ async function testISPManualAndWebhookFlow() {
 	assert(fs.existsSync(expectedProcAPath), "ProcA should create output file");
 	assert(fs.existsSync(expectedProcASubPath), "ProcA should create sub output file");
 	assert(procAItem.json.globalInput.gain === 1.5, "ISPBlock should read shared global gain");
+	assert(procAItem.json.version === "default", "ProcA should expose selected version");
+	assert(procAItem.json.processingResult.stdout.version === "default", "ProcA process.py should receive version");
+	assert(procAItem.json.ispHistory[0].version === "default", "ProcA history should record version");
 	assert(procAItem.json.blockReadme.includes("ProcA"), "ProcA README should be included in output");
 	assert(procAItem.json.processingResult.ran === true, "ProcA process.py should run");
 
@@ -167,6 +173,7 @@ async function testISPManualAndWebhookFlow() {
 		items: [procAItem],
 		params: {
 			blockName: "ProcB",
+			version: "default",
 			inputFilesJson: "{}",
 			outputDirectory: tmpDir,
 			runProcessor: true,
@@ -192,6 +199,7 @@ async function testISPManualAndWebhookFlow() {
 		"ProcB history should record ProcA sub output as input",
 	);
 	assert(procBItem.json.processingResult.ran === true, "ProcB process.py should run");
+	assert(procBItem.json.ispHistory[1].version === "default", "ProcB history should record version");
 
 	pass("ISPInput and ISPBlock manual/webhook flow");
 }

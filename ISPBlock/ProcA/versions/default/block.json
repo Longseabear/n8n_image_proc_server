@@ -1,0 +1,6 @@
+{
+  "executable": "python",
+  "args": [
+    "${ISP_ROOT}/_tools/mock_isp_exe.py"
+  ]
+}

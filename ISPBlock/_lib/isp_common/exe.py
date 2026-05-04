@@ -9,7 +9,12 @@ def isp_root():
     return Path(os.environ.get("ISP_ROOT", Path(__file__).resolve().parents[2]))
 
 
-def load_block_config(block_name):
+def load_block_config(block_name, version="default"):
+    version_config_path = isp_root() / block_name / "versions" / version / "block.json"
+    if version_config_path.exists():
+        with version_config_path.open("r", encoding="utf-8") as file:
+            return json.load(file)
+
     config_path = isp_root() / block_name / "block.json"
     if not config_path.exists():
         return {
@@ -30,7 +35,8 @@ def expand_token(value):
 
 def run_block_executable(payload):
     block_name = payload["blockName"]
-    config = load_block_config(block_name)
+    version = payload.get("version", "default")
+    config = load_block_config(block_name, version)
     executable = expand_token(config.get("executable") or sys.executable)
     args = [expand_token(arg) for arg in config.get("args", [])]
     timeout = payload.get("options", {}).get("timeoutMs", 30000) / 1000
@@ -50,10 +56,11 @@ def run_block_executable(payload):
 
     stdout = completed.stdout.strip()
     if not stdout:
-        return {"blockName": block_name, "executable": executable, "args": args}
+        return {"blockName": block_name, "version": version, "executable": executable, "args": args}
 
     result = json.loads(stdout)
     result.setdefault("blockName", block_name)
+    result.setdefault("version", version)
     result.setdefault("executable", executable)
     result.setdefault("args", args)
     return result

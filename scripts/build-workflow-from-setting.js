@@ -223,6 +223,7 @@ const nodeKinds = {
     buildParameters(node) {
       return {
         blockName: node.blockName || 'ProcA',
+        version: node.version || 'default',
         inputFilesJson: JSON.stringify(node.inputFiles || {}, null, 2),
         outputDirectory: node.outputDirectory || '',
         runProcessor: node.runProcessor !== false,
