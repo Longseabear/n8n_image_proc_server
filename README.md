@@ -209,6 +209,18 @@ To generate and import it into the local n8n database in one step:
 npm run sync:workflow
 ```
 
+To import the current `exports/generated-workflow.json` without rebuilding it:
+
+```powershell
+npm run sync:exports
+```
+
+To import every top-level `*.json` file in `exports/` without rebuilding:
+
+```powershell
+npm run sync:exports:all
+```
+
 ## Harness
 
 Run the local harness without starting n8n:
