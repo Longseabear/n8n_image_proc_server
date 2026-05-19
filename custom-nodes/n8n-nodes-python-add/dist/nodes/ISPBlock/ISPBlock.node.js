@@ -54,8 +54,8 @@ function listVersions(blockName) {
 			const description = fs.existsSync(readmePath)
 				? fs.readFileSync(readmePath, "utf8").split(/\r?\n/).find((line) => line.trim()) || entry.name
 				: fs.existsSync(blockConfigPath)
-					? `${entry.name}/block.json`
-					: entry.name;
+					? `Uses ${entry.name}/block.json`
+					: "No version block.json; process.py will use block-level/default config.";
 
 			return {
 				name: entry.name,
@@ -83,7 +83,9 @@ function buildReadmeNotice() {
 	return blocks
 		.map((block) => {
 			const readmePath = path.join(getIspRoot(), block.value, "README.md");
-			const readme = fs.existsSync(readmePath) ? fs.readFileSync(readmePath, "utf8").trim() : "README.md not found.";
+			const readme = fs.existsSync(readmePath)
+				? fs.readFileSync(readmePath, "utf8").trim()
+				: "No README.md yet. The block can still run; add README.md to show notes here.";
 			return `<b>${block.value}</b><br><pre>${readme}</pre>`;
 		})
 		.join("<br><br>");
@@ -101,12 +103,29 @@ function safeParseJson(value, fallback, label) {
 	}
 }
 
-function normalizeFileMap(fileMap) {
+function normalizeFileMap(fileMap, label = "Input files") {
 	if (!fileMap || typeof fileMap !== "object" || Array.isArray(fileMap)) {
-		throw new Error("Input files must be a JSON object, for example {\"raw\":\"C:/images/raw.png\"}");
+		throw new Error(`${label} must be a JSON object, for example {"raw":"C:/images/raw.png"}`);
 	}
 
 	return fileMap;
+}
+
+function processorStdoutError(stdoutJson) {
+	if (!stdoutJson || typeof stdoutJson !== "object" || Array.isArray(stdoutJson)) {
+		return "";
+	}
+
+	if (!Object.prototype.hasOwnProperty.call(stdoutJson, "error")) {
+		return "";
+	}
+
+	const error = stdoutJson.error;
+	if (error === undefined || error === null || error === false || error === "") {
+		return "";
+	}
+
+	return typeof error === "string" ? error : JSON.stringify(error);
 }
 
 function makeOutputPath(inputPath, blockName, outputDirectory) {
@@ -189,9 +208,15 @@ function runProcessorScript({
 		};
 	}
 
+	const stdoutJson = JSON.parse(stdout);
+	const stdoutError = processorStdoutError(stdoutJson);
+	if (stdoutError) {
+		throw new Error(`process.py reported error: ${stdoutError}`);
+	}
+
 	return {
 		ran: true,
-		stdout: JSON.parse(stdout),
+		stdout: stdoutJson,
 	};
 }
 
@@ -242,6 +267,13 @@ class ISPBlock {
 					type: "json",
 					default: "{}",
 					description: "Fallback only. Prefer connecting ISPInput before ISPBlock. Shape: key=name, value=file path.",
+				},
+				{
+					displayName: "Sub Input Files JSON",
+					name: "subInputFilesJson",
+					type: "json",
+					default: "{}",
+					description: "Fallback sub input file map. Prefer connecting ISPInput before ISPBlock. Shape: key=name, value=file path.",
 				},
 				{
 					displayName: "Global Config File: edit workspace/ISPBlock/global.json once to update gain, EIT, and TMC for every ISPBlock node.",
@@ -332,6 +364,7 @@ class ISPBlock {
 			const blockName = this.getNodeParameter("blockName", itemIndex);
 			const version = this.getNodeParameter("version", itemIndex);
 			const inputFilesJson = this.getNodeParameter("inputFilesJson", itemIndex);
+			const subInputFilesJson = this.getNodeParameter("subInputFilesJson", itemIndex);
 			const outputDirectory = this.getNodeParameter("outputDirectory", itemIndex);
 			const runProcessor = this.getNodeParameter("runProcessor", itemIndex);
 			const pythonCommand = this.getNodeParameter("pythonCommand", itemIndex);
@@ -367,8 +400,12 @@ class ISPBlock {
 					items[itemIndex].json.mainFiles ||
 						items[itemIndex].json.files ||
 						safeParseJson(inputFilesJson, {}, "Input Files JSON"),
+					"Input files",
 				);
-				subFiles = normalizeFileMap(items[itemIndex].json.subFiles || {}, "Sub input files");
+				subFiles = normalizeFileMap(
+					items[itemIndex].json.subFiles || safeParseJson(subInputFilesJson, {}, "Sub Input Files JSON"),
+					"Sub input files",
+				);
 			} catch (error) {
 				throw new NodeOperationError(this.getNode(), error.message, { itemIndex });
 			}

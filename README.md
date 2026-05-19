@@ -110,13 +110,13 @@ ISPBlock/ProcB/versions/default/block.json
 ISPBlock/_tools/mock_isp_exe.py
 ```
 
-Each block has a `versions/` folder. Select the version in the ISPBlock node UI. The selected version is passed to `process.py` as `payload.version`, and executable config is loaded from:
+Each block has a `versions/` folder. Select the version in the ISPBlock node UI. The selected version is passed to `process.py` as `payload.version`. If present, executable config is loaded from:
 
 ```text
 ISPBlock/<BlockName>/versions/<VersionName>/block.json
 ```
 
-Replace the `executable` and `args` in each version `block.json` with the real `.exe` command later.
+Replace the `executable` and `args` in each version `block.json` with the real `.exe` command later. A version can omit `block.json`; `process.py` may use the block-level config or its own default behavior.
 
 The ISP payload has separate main and sub inputs:
 
@@ -130,6 +130,8 @@ The ISP payload has separate main and sub inputs:
   }
 }
 ```
+
+`ISPBlock` also exposes both `Input Files JSON` and `Sub Input Files JSON` fallback fields, so main and sub inputs can be configured directly in the node UI when no upstream `ISPInput` node is connected.
 
 Shared ISP parameters live in one file:
 

@@ -115,6 +115,10 @@ async function testISPManualAndWebhookFlow() {
 	});
 	assert(procAVersions.some((version) => version.value === "default"), "ISPBlock should list version folders");
 	assert(missingVersions.length === 0, "ISPBlock should return an empty version list when versions are missing");
+	assert(
+		ispBlockNode.description.properties.some((property) => property.name === "subInputFilesJson"),
+		"ISPBlock should expose Sub Input Files JSON in node parameters",
+	);
 
 	const tmpDir = path.join(root, "exports", "harness");
 	const inputPath = path.join(tmpDir, "input.png");
@@ -122,6 +126,104 @@ async function testISPManualAndWebhookFlow() {
 	fs.mkdirSync(tmpDir, { recursive: true });
 	fs.writeFileSync(inputPath, "not-a-real-image-but-valid-file-for-copy-tests", "utf8");
 	fs.writeFileSync(subInputPath, "not-a-real-calibration-file", "utf8");
+
+	const noConfigBlockName = "__HarnessNoConfig";
+	const noConfigBlockDir = path.join(root, "ISPBlock", noConfigBlockName);
+	fs.rmSync(noConfigBlockDir, { recursive: true, force: true });
+	fs.mkdirSync(path.join(noConfigBlockDir, "versions", "draft"), { recursive: true });
+	fs.writeFileSync(
+		path.join(noConfigBlockDir, "process.py"),
+		[
+			"import json",
+			"import sys",
+			"",
+			"payload = json.load(sys.stdin)",
+			"print(json.dumps({\"version\": payload[\"version\"], \"subInputFiles\": payload.get(\"subInputFiles\", {})}))",
+			"",
+		].join("\n"),
+		"utf8",
+	);
+	try {
+		const noConfigVersions = await ispBlockNode.methods.loadOptions.getVersions.call({
+			getCurrentNodeParameter() {
+				return noConfigBlockName;
+			},
+		});
+		assert(
+			noConfigVersions.some(
+				(version) =>
+					version.value === "draft" &&
+					version.description === "No version block.json; process.py will use block-level/default config.",
+			),
+			"ISPBlock should list versions without block.json using a non-error description",
+		);
+
+		const noConfigRun = await executeNode(ISPBlock, {
+			items: [{ json: {} }],
+			params: {
+				blockName: noConfigBlockName,
+				version: "draft",
+				inputFilesJson: JSON.stringify({ raw: inputPath }),
+				subInputFilesJson: JSON.stringify({ calibration: subInputPath }),
+				outputDirectory: tmpDir,
+				runProcessor: true,
+				pythonCommand: "python",
+				requireInputFiles: true,
+				processorTimeoutMs: 30000,
+				includeReadme: false,
+			},
+		});
+		assert(
+			noConfigRun[0][0].json.processingResult.stdout.version === "draft",
+			"ISPBlock should run a selected version without version block.json",
+		);
+		assert(
+			noConfigRun[0][0].json.ispHistory[0].subInputFiles.calibration === subInputPath,
+			"ISPBlock should use Sub Input Files JSON as a fallback",
+		);
+	} finally {
+		fs.rmSync(noConfigBlockDir, { recursive: true, force: true });
+	}
+
+	const errorBlockName = "__HarnessStdoutError";
+	const errorBlockDir = path.join(root, "ISPBlock", errorBlockName);
+	fs.rmSync(errorBlockDir, { recursive: true, force: true });
+	fs.mkdirSync(path.join(errorBlockDir, "versions", "default"), { recursive: true });
+	fs.writeFileSync(
+		path.join(errorBlockDir, "process.py"),
+		[
+			"import json",
+			"",
+			"print(json.dumps({\"error\": \"stdout boom\"}))",
+			"",
+		].join("\n"),
+		"utf8",
+	);
+	try {
+		await executeNode(ISPBlock, {
+			items: [{ json: { mainFiles: { raw: inputPath } } }],
+			params: {
+				blockName: errorBlockName,
+				version: "default",
+				inputFilesJson: "{}",
+				subInputFilesJson: "{}",
+				outputDirectory: tmpDir,
+				runProcessor: true,
+				pythonCommand: "python",
+				requireInputFiles: true,
+				processorTimeoutMs: 30000,
+				includeReadme: false,
+			},
+		});
+		assert(false, "ISPBlock should fail when process.py stdout JSON has an error field");
+	} catch (error) {
+		assert(
+			String(error.message || error).includes("stdout boom"),
+			"ISPBlock should surface process.py stdout error text",
+		);
+	} finally {
+		fs.rmSync(errorBlockDir, { recursive: true, force: true });
+	}
 
 	const manualInput = await executeNode(ISPInput, {
 		items: [{ json: {} }],

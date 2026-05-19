@@ -225,6 +225,7 @@ const nodeKinds = {
         blockName: node.blockName || 'ProcA',
         version: node.version || 'default',
         inputFilesJson: JSON.stringify(node.inputFiles || {}, null, 2),
+        subInputFilesJson: JSON.stringify(node.subInputFiles || {}, null, 2),
         outputDirectory: node.outputDirectory || '',
         runProcessor: node.runProcessor !== false,
         pythonCommand: node.pythonCommand || 'python',
