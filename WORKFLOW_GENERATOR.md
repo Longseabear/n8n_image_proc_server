@@ -131,6 +131,52 @@ If a node is not supported as a shortcut yet, provide raw n8n fields:
 
 Raw mode lets the workflow build continue while keeping the exact n8n parameters you copied from an exported workflow.
 
+## ISPInput and ISPBlock
+
+`ispInput` accepts these shortcut fields:
+
+- `fileSource`: `auto`, `inputJson`, or `parameter`
+- `mainInputFiles`: object serialized into `Main Input Files JSON`
+- `subInputFiles`: object serialized into `Sub Input Files JSON`
+
+`ispBlock` accepts these shortcut fields:
+
+- `blockName`: block folder under `ISPBlock/`
+- `version`: folder under `ISPBlock/<BlockName>/versions/`
+- `inputFiles`: object serialized into `Input Files JSON`
+- `subInputFiles`: object serialized into `Sub Input Files JSON`
+- `outputDirectory`
+- `runProcessor`
+- `pythonCommand`
+- `requireInputFiles`
+- `processorTimeoutMs`
+- `includeReadme`
+
+Example:
+
+```json
+{
+  "name": "ISP ProcA",
+  "kind": "ispBlock",
+  "blockName": "ProcA",
+  "version": "default",
+  "inputFiles": {
+    "raw": "C:/images/input.png"
+  },
+  "subInputFiles": {
+    "calibration": "C:/images/calibration.png"
+  },
+  "outputDirectory": "C:/images/out",
+  "runProcessor": true,
+  "pythonCommand": "python",
+  "requireInputFiles": true,
+  "processorTimeoutMs": 30000,
+  "includeReadme": true
+}
+```
+
+See `docs/ISPBlock.md` for the runtime payload, output shape, version config, and stdout error rules.
+
 Example:
 
 ```json

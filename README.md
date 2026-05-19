@@ -89,20 +89,28 @@ An importable example is available at:
 examples/preset-script-runner.json
 ```
 
-`ISPInput` creates the initial file list placeholder. `ISPBlock` demonstrates a folder-managed image-processing block. Blocks live under:
+## ISP Blocks
+
+`ISPInput` creates the initial file list placeholder. `ISPBlock` runs a folder-managed image-processing block. The full node contract is documented in:
+
+```text
+docs/ISPBlock.md
+```
+
+Blocks live under:
 
 ```text
 ISPBlock/ProcA/README.md
 ISPBlock/ProcB/README.md
 ```
 
-`ISPBlock` exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI. Each block can include a `process.py` file:
+`ISPBlock` exposes a dropdown populated from `ISPBlock/*` folders and shows the block README content in the node UI when available. Each block can include a `process.py` file:
 
 ```text
 ISPBlock/<BlockName>/process.py
 ```
 
-`ISPBlock` passes a JSON payload through stdin and reads optional JSON from stdout. Each `process.py` is a Python wrapper that can call a real executable. The example blocks use:
+`ISPBlock` passes a JSON payload through stdin and reads optional JSON from stdout. If stdout JSON contains a truthy `error` field, the n8n node fails even when `process.py` exits with code `0`. Each `process.py` is a Python wrapper that can call a real executable. The example blocks use:
 
 ```text
 ISPBlock/ProcA/versions/default/block.json
